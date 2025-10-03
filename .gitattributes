@@ -1,0 +1,32 @@
+# 모든 텍스트 파일은 자동으로 EOL 변환 (LF로 통일)
+* text=auto eol=lf
+
+# 코드 파일 → diff/merge 시 텍스트로 처리
+*.java      text diff=java
+*.kt        text diff=kotlin
+*.gradle    text
+*.yml       text
+*.yaml      text
+*.xml       text
+*.properties text
+*.md        text
+*.txt       text
+
+# OS 특화 파일
+.DS_Store binary
+
+# 바이너리 파일 → diff/merge 안 함
+*.jar   binary
+*.war   binary
+*.ear   binary
+*.class binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.pdf   binary
+
+# Lock 파일 충돌 시 내(local) 버전 유지
+package-lock.json merge=ours
+yarn.lock merge=ours

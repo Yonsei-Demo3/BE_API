@@ -1,0 +1,101 @@
+############################
+# OS (macOS)
+############################
+.DS_Store
+**/.DS_Store
+.AppleDouble
+.LSOverride
+.Spotlight-V100
+.Trashes
+._*
+
+############################
+# Java / General
+############################
+*.class
+*.log
+*.ctxt
+hs_err_pid*
+replay_pid*
+
+############################
+# Spring Boot / Logs
+############################
+/logs/
+/tmp/
+/*.pid
+/*.pid.lock
+*.hprof
+
+############################
+# Gradle
+############################
+.gradle/
+/build/
+/out/
+!gradle/wrapper/gradle-wrapper.jar
+# (gradle-wrapper는 커밋 유지 권장)
+# gradle.properties에 민감정보가 있다면 별도 관리 권장
+
+############################
+# Maven (프로젝트가 Maven이면)
+/target/
+!.mvn/wrapper/maven-wrapper.jar
+# (mvnw, mvnw.cmd, wrapper JAR는 커밋 유지 권장)
+
+############################
+# IDE
+############################
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# VS Code (사용한다면)
+.vscode/
+
+# Eclipse / STS
+.project
+.classpath
+.settings/
+.factorypath
+*.prefs
+/bin/
+
+############################
+# Docker / Env
+############################
+.env
+.env.*
+docker-compose.override.yml
+
+############################
+# Security / Keys (필요 시)
+############################
+*.keystore
+*.jks
+*.p12
+*.pem
+*.crt
+*.key
+
+############################
+# Node (프론트 서브모듈 있을 경우)
+############################
+node_modules/
+dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+############################
+# Application Config (권장 패턴)
+############################
+# 기본 예시 파일은 추적하고, 실제 비밀값이 들어가는 프로파일은 무시
+# 예) application-example.yml은 커밋, 실제 운영/개발 프로파일은 비공개 관리
+src/main/resources/application-*.yml
+!src/main/resources/application-example.yml
+# 필요한 경우 기본 application.yml은 추적 유지
+# (원하면 아래 주석 해제해서 기본도 무시 가능)
+# src/main/resources/application.yml
