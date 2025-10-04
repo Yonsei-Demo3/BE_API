@@ -1,0 +1,23 @@
+# VCS / IDE
+.git
+.gitignore
+.idea
+*.iml
+.vscode
+
+# Build outputs
+build
+out
+target
+
+# Gradle cache on host (컨테이너 내 캐시 사용)
+.gradle
+
+# OS junk
+.DS_Store
+**/.DS_Store
+
+# Logs / temp
+logs
+*.log
+tmp

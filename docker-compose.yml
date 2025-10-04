@@ -1,0 +1,50 @@
+version: "3.9"
+
+services:
+  app:
+    image: ${APP_IMAGE}
+    container_name: be-api
+    # 로컬에서 소스 수정 반영이 필요하면 build 섹션을 쓰세요.
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+    ports:
+      - "${APP_PORT}:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: "${SPRING_PROFILES_ACTIVE}"
+      # 예시) DB 연결값 (DB 사용 시)
+      # SPRING_DATASOURCE_URL: "jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=utf8"
+      # SPRING_DATASOURCE_USERNAME: "${DB_USER}"
+      # SPRING_DATASOURCE_PASSWORD: "${DB_PASSWORD}"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/healthz || exit 1"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+    depends_on: []  # DB 추가 시: [db]
+    networks:
+      - app-net
+
+  # 선택) MySQL 예시 — 나중에 필요할 때 주석 해제
+  # db:
+  #   image: mysql:8.4
+  #   container_name: mysql
+  #   ports:
+  #     - "3306:3306"
+  #   environment:
+  #     MYSQL_DATABASE: "${DB_NAME}"
+  #     MYSQL_USER: "${DB_USER}"
+  #     MYSQL_PASSWORD: "${DB_PASSWORD}"
+  #     MYSQL_ROOT_PASSWORD: "rootpass"
+  #   volumes:
+  #     - db-data:/var/lib/mysql
+  #   restart: unless-stopped
+  #   networks:
+  #     - app-net
+
+networks:
+  app-net:
+
+volumes:
+  db-data:
