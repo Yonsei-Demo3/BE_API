@@ -1,4 +1,4 @@
-package com.backend.HealthCheck;
+package com.backend.healthcheck;
 
 import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
