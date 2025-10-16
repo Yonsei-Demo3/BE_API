@@ -3,6 +3,8 @@ package com.backend.member.domain;
 import jakarta.persistence.*;
 // 이메일 형식 검증용
 import jakarta.validation.constraints.Email;
+import lombok.Builder;
+import lombok.Getter;
 
 /**
  * Member 엔티티
@@ -13,6 +15,7 @@ import jakarta.validation.constraints.Email;
 @Table(name = "members", indexes = {
         @Index(name = "idx_member_email_unique", columnList = "email", unique = true)
 })
+@Getter
 public class Member {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,6 +37,7 @@ public class Member {
 
     protected Member() {} // JPA 기본 생성자
 
+    @Builder
     private Member(String email, String rawEncodedPassword, String nickname, Role role) {
         this.email = email;
         this.password = rawEncodedPassword;
@@ -50,11 +54,4 @@ public class Member {
     // nickname 변경
     public void changeNickname(String nickname) { this.nickname = nickname; }
     public void changeRole(Role role) { this.role = role; }
-
-    // getters
-    public Long getId() { return id; }
-    public String getEmail() { return email; }
-    public String getPassword() { return password; }
-    public String getNickname() { return nickname; }
-    public Role getRole() { return role; }
 }
