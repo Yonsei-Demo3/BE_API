@@ -9,7 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.backend.member.domain.Member;
-import com.backend.member.dto.MemberDto;
+import com.backend.member.dto.SignUpRequestDTO;
+import com.backend.member.dto.UpdateNicknameRequestDTO;
+import com.backend.member.dto.MemberResponseDTO;
 import com.backend.member.service.MemberService;
 
 @Tag(name = "Member", description = "회원 API")
@@ -22,28 +24,35 @@ public class MemberController {
 
     @Operation(summary = "회원 가입")
     @PostMapping
-    public ResponseEntity<MemberDto.Response> signUp(@Valid @RequestBody MemberDto.SignUpRequest req) {
+    public ResponseEntity<MemberResponseDTO> signUp(@Valid @RequestBody SignUpRequestDTO req) {
         Member saved = memberService.signUp(req);
-        return ResponseEntity.ok(MemberDto.Response.from(saved));
+        return ResponseEntity.ok(MemberResponseDTO.from(saved));
     }
 
     @Operation(summary = "회원 단일 조회")
     @GetMapping("/{id}")
-    public ResponseEntity<MemberDto.Response> get(@PathVariable Long id) {
-        return ResponseEntity.ok(MemberDto.Response.from(memberService.get(id)));
+    public ResponseEntity<MemberResponseDTO> get(@PathVariable Long id) {
+        Member found = memberService.get(id);
+        return ResponseEntity.ok(MemberResponseDTO.from(found));
     }
 
     @Operation(summary = "회원 목록 조회 (페이지)")
     @GetMapping
-    public ResponseEntity<Page<MemberDto.Response>> list(Pageable pageable) {
-        return ResponseEntity.ok(memberService.list(pageable).map(MemberDto.Response::from));
+    public ResponseEntity<Page<MemberResponseDTO>> list(Pageable pageable) {
+        Page<MemberResponseDTO> page = memberService
+                .list(pageable)
+                .map(MemberResponseDTO::from);
+        return ResponseEntity.ok(page);
     }
 
     @Operation(summary = "닉네임 변경")
     @PatchMapping("/{id}/nickname")
-    public ResponseEntity<MemberDto.Response> changeNickname(@PathVariable Long id,
-                                                             @Valid @RequestBody MemberDto.UpdateNicknameRequest req) {
-        return ResponseEntity.ok(MemberDto.Response.from(memberService.changeNickname(id, req)));
+    public ResponseEntity<MemberResponseDTO> changeNickname(
+        @PathVariable Long id,
+        @Valid @RequestBody UpdateNicknameRequestDTO req
+    ) {
+        Member updated = memberService.changeNickname(id, req);
+        return ResponseEntity.ok(MemberResponseDTO.from(updated));
     }
     
     @Operation(summary = "회원 삭제")
