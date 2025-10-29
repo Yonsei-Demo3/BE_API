@@ -54,8 +54,8 @@ public class MemberService {
      * 닉네임 변경 (쓰기 작업)
      */
     @Transactional
-    public Member changeNickname(Long id, UpdateNicknameRequestDTO req) {
-        Member m = repo.findById(id)
+    public Member changeNickname(Long myId, UpdateNicknameRequestDTO req) {
+        Member m = repo.findById(myId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원"));
 
         m.changeNickname(req.nickname());
@@ -78,7 +78,7 @@ public class MemberService {
      * 회원 삭제
      */
     @Transactional
-    public void delete(Long id) {
-        repo.deleteById(id);
+    public void delete(Long myId) {
+        repo.deleteById(myId);
     }
 }

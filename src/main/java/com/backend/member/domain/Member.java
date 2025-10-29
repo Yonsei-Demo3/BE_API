@@ -50,7 +50,7 @@ public class Member {
     }
 
 
-    // ------------- buisness logic -------------
+    // ------------- business logic -------------
     // nickname 변경
     public void changeNickname(String nickname) { this.nickname = nickname; }
     public void changeRole(Role role) { this.role = role; }

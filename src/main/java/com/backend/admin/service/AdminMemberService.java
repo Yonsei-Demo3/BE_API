@@ -1,8 +1,6 @@
 package com.backend.admin.service;
 
-import jakarta.transaction.Transactional;
-import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;import org.springframework.stereotype.Service;
 import com.backend.member.domain.Member;
 import com.backend.member.domain.Role;
 import com.backend.member.repository.MemberRepository;
