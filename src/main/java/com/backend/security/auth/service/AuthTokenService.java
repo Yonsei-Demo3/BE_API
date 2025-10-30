@@ -15,6 +15,7 @@ public class AuthTokenService {
 
     private final JwtTokenProvider tokenProvider;
     private final RefreshTokenRepository refreshRepo;
+    private static final long MS_TO_SECONDS = 1000L;
 
     public AuthTokenService(JwtTokenProvider tokenProvider,
                             RefreshTokenRepository refreshRepo) {
@@ -51,8 +52,8 @@ public class AuthTokenService {
                 access,
                 refresh,
                 "Bearer",
-                tokenProvider.getAccessValidityMs() / 1000,
-                tokenProvider.getRefreshValidityMs() / 1000
+                tokenProvider.getAccessValidityMs() / MS_TO_SECONDS,
+                tokenProvider.getRefreshValidityMs() / MS_TO_SECONDS
         );
     }
 }

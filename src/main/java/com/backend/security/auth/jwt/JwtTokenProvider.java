@@ -1,7 +1,6 @@
 package com.backend.security.auth.jwt;
 
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,8 +24,7 @@ public class JwtTokenProvider {
             @Value("${app.jwt.access-token-validity-ms}") long accessValidityMs,
             @Value("${app.jwt.refresh-token-validity-ms}") long refreshValidityMs
     ) {
-        String base64 = java.util.Base64.getEncoder().encodeToString(secret.getBytes(java.nio.charset.StandardCharsets.UTF_8));
-        this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(base64));
+        this.key = Keys.hmacShaKeyFor(secret.getBytes(java.nio.charset.StandardCharsets.UTF_8));
         this.accessValidityMs = accessValidityMs;
         this.refreshValidityMs = refreshValidityMs;
     }
