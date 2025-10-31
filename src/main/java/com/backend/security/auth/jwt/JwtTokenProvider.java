@@ -29,21 +29,21 @@ public class JwtTokenProvider {
         this.refreshValidityMs = refreshValidityMs;
     }
 
-    public String createAccessToken(String email, String role) {
-        return buildToken(email, role, accessValidityMs);
+    public String createAccessToken(String userId, String role) {
+        return buildToken(userId, role, accessValidityMs);
     }
 
-    public String createRefreshToken(String email) {
+    public String createRefreshToken(String userId) {
         // 리프레시는 최소 정보만 (role 불필요)
-        return buildToken(email, null, refreshValidityMs);
+        return buildToken(userId, null, refreshValidityMs);
     }
 
-    private String buildToken(String email, String role, long validity) {
+    private String buildToken(String subject, String role, long validity) {
         Date now = new Date();
         Date exp = new Date(now.getTime() + validity);
 
         JwtBuilder builder = Jwts.builder()
-                .setSubject(email)
+                .setSubject(subject)
                 .setIssuedAt(now)
                 .setExpiration(exp)
                 .signWith(key, SignatureAlgorithm.HS256);
@@ -63,12 +63,12 @@ public class JwtTokenProvider {
 
     public Authentication getAuthentication(String token) {
         Claims body = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
-        String email = body.getSubject();
+        String userId = body.getSubject();
         String role = body.get("role", String.class); // access 토큰에는 존재
         var auth = (role != null)
                 ? new SimpleGrantedAuthority("ROLE_" + role)
                 : null;
-        return new UsernamePasswordAuthenticationToken(email, token, auth == null ? List.of() : List.of(auth));
+        return new UsernamePasswordAuthenticationToken(userId, token, auth == null ? List.of() : List.of(auth));
     }
 
     public long getAccessValidityMs()  { return accessValidityMs; }

@@ -31,8 +31,8 @@ public class AuthTokenService {
     public TokenResponseDTO issueTokensFor(Member member) {
 
         // 1) 새 토큰 발급
-        String access  = tokenProvider.createAccessToken(member.getEmail(), member.getRole().name());
-        String refresh = tokenProvider.createRefreshToken(member.getEmail());
+        String access  = tokenProvider.createAccessToken(String.valueOf(member.getId()), member.getRole().name());
+        String refresh = tokenProvider.createRefreshToken(String.valueOf(member.getId()));
 
         // 2) 만료시각 계산
         Instant refreshExp = Instant.now().plusMillis(tokenProvider.getRefreshValidityMs());
