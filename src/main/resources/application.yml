@@ -13,6 +13,9 @@ springdoc:
 
 app:
   jwt:
-    access-token-validity-ms: 3600000
+    secret: ${JWT_SECRET:local-secret-key}
+    issuer: my-backend-api
+    audience: web
+    access-token-validity-ms: 900000
     refresh-token-validity-ms: 1209600000
-    secret: VlwEyVBsYt9V7zq57TejMnVUyzblYcfPQye08f7MGVA9XkHa #임시 64bytes random secret. 실제 배포 환경에서는 .env에 설정할 것.
+    clock-skew-sec: 60

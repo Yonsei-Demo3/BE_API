@@ -15,7 +15,6 @@ public class AuthTokenService {
 
     private final JwtTokenProvider tokenProvider;
     private final RefreshTokenRepository refreshRepo;
-    private static final long MS_TO_SECONDS = 1000L;
 
     public AuthTokenService(JwtTokenProvider tokenProvider,
                             RefreshTokenRepository refreshRepo) {
@@ -35,7 +34,7 @@ public class AuthTokenService {
         String refresh = tokenProvider.createRefreshToken(String.valueOf(member.getId()));
 
         // 2) 만료시각 계산
-        Instant refreshExp = Instant.now().plusMillis(tokenProvider.getRefreshValidityMs());
+        Instant refreshExp = Instant.now().plus(tokenProvider.getRefreshValidity());
 
         // 3) refresh 토큰 DB 반영 (있으면 rotate, 없으면 insert)
         refreshRepo.findByEmail(member.getEmail())
@@ -52,8 +51,8 @@ public class AuthTokenService {
                 access,
                 refresh,
                 "Bearer",
-                tokenProvider.getAccessValidityMs() / MS_TO_SECONDS,
-                tokenProvider.getRefreshValidityMs() / MS_TO_SECONDS
+                tokenProvider.getAccessValidity().getSeconds(),
+                tokenProvider.getRefreshValidity().getSeconds()
         );
     }
 }
