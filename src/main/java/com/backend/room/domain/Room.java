@@ -20,6 +20,8 @@ public class Room {
     @Column(nullable = false, length = 1000)
     private String description;
 
+    //TODO: 방장도 고려해야 하나?
+
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
