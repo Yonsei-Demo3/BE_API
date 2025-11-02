@@ -4,8 +4,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import lombok.Builder;
 
-
+@Builder
 public class CustomUserPrincipal implements UserDetails {
 
     private final Long memberId;

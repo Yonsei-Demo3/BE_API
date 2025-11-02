@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.backend.member.domain.Member;
 import com.backend.security.auth.domain.RefreshToken;
+import com.backend.security.util.HashUtil;
 import com.backend.security.auth.dto.TokenResponseDTO;
 import com.backend.security.auth.jwt.JwtTokenProvider;
 import com.backend.security.auth.repository.RefreshTokenRepository;
@@ -15,7 +16,7 @@ public class AuthTokenService {
 
     private final JwtTokenProvider tokenProvider;
     private final RefreshTokenRepository refreshRepo;
-
+    
     public AuthTokenService(JwtTokenProvider tokenProvider,
                             RefreshTokenRepository refreshRepo) {
         this.tokenProvider = tokenProvider;
@@ -29,30 +30,42 @@ public class AuthTokenService {
      */
     public TokenResponseDTO issueTokensFor(Member member) {
 
-        // 1) 새 토큰 발급
+        // 1️⃣ Access / Refresh 토큰 생성
         String access  = tokenProvider.createAccessToken(String.valueOf(member.getId()), member.getRole().name());
         String refresh = tokenProvider.createRefreshToken(String.valueOf(member.getId()));
 
-        // 2) 만료시각 계산
+        // 2️⃣ Refresh 토큰 해시 계산
+        String refreshHash = HashUtil.sha256Base64(refresh);
+        System.out.println("[LOGIN] memberId=" + member.getId()
+        + " refreshHash=" + refreshHash.substring(0, 12) + "...");
+
+
+
+        /// 3️⃣ 만료 시각 계산
         Instant refreshExp = Instant.now().plus(tokenProvider.getRefreshValidity());
 
-        // 3) refresh 토큰 DB 반영 (있으면 rotate, 없으면 insert)
-        refreshRepo.findByEmail(member.getEmail())
-                .ifPresentOrElse(
-                        rt -> {
-                            rt.rotate(refresh, refreshExp);
-                            refreshRepo.save(rt);
-                        },
-                        () -> refreshRepo.save(new RefreshToken(member.getEmail(), refresh, refreshExp))
-                );
+        // 4️⃣ DB에 저장 (있으면 rotate, 없으면 새로 생성)
+        Long memberId = Long.valueOf(member.getId());
+        refreshRepo.findByMemberId(memberId)
+        .ifPresentOrElse(
+                rt -> {
+                    System.out.println("[LOGIN] rotate existing RT row, id=" + rt.getId());
+                    rt.rotate(refreshHash, refreshExp);
+                    refreshRepo.save(rt);
+                },
+                () -> {
+                    System.out.println("[LOGIN] insert new RT row");
+                    refreshRepo.save(new RefreshToken(memberId, refreshHash, refreshExp));
+                }
+            );
 
-        // 4) 응답 DTO로 만들어 반환
-        return new TokenResponseDTO(
-                access,
-                refresh,
-                "Bearer",
-                tokenProvider.getAccessValidity().getSeconds(),
-                tokenProvider.getRefreshValidity().getSeconds()
-        );
+    // 5️⃣ 응답 DTO 리턴 (클라엔트엔 원문 refresh 전달)
+    return new TokenResponseDTO(
+        access,
+        refresh,
+        "Bearer",
+        tokenProvider.getAccessValidity().toSeconds(),
+        tokenProvider.getRefreshValidity().toSeconds()
+    );
     }
 }

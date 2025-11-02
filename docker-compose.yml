@@ -25,6 +25,10 @@ services:
     depends_on: []  # DB 추가 시: [db]
     networks:
       - app-net
+    redis:
+      image: redis:7-alpine
+      ports:
+        - "6379:6379"
 
   # 선택) MySQL 예시 — 나중에 필요할 때 주석 해제
   # db:
