@@ -1,4 +1,4 @@
-package com.backend.RoomMember;
+package com.backend.roomMember;
 
 
 import org.springframework.data.jpa.repository.JpaRepository;
