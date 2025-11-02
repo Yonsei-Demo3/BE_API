@@ -1,4 +1,4 @@
-package com.backend.message;
+package com.backend.message.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

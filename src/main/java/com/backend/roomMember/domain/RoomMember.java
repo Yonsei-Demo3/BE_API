@@ -1,4 +1,4 @@
-package com.backend.roomMember;
+package com.backend.roomMember.domain;
 
 import com.backend.member.domain.Member;
 import com.backend.room.domain.Room;
@@ -42,7 +42,7 @@ public class RoomMember {
         this.member = member;
     }
 
-    public static RoomMember from(Room room, Member member) {
+    public static RoomMember of(Room room, Member member) {
         return new RoomMember(room, member);
     }
 }

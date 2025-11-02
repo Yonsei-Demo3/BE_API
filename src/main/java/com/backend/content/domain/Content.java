@@ -1,4 +1,4 @@
-package com.backend.content;
+package com.backend.content.domain;
 
 import jakarta.persistence.*;
 import lombok.Builder;

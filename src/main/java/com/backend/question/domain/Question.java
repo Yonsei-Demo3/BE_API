@@ -1,6 +1,7 @@
-package com.backend.question;
+package com.backend.question.domain;
 
-import com.backend.content.Content;
+import com.backend.content.domain.Content;
+import com.backend.member.domain.Member;
 import com.backend.room.domain.Room;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -28,6 +29,14 @@ public class Question {
     @Column(name = "max_participants", nullable = false)
     private int maxParticipants;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private QuestionStatus status;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "host_id", nullable = false)
+    private Member host;
+
     @ManyToOne(fetch = FetchType.LAZY) //TODO: Cascade 정책 고려...
     @JoinColumn(name = "room_id", nullable = false)
     private Room room;
@@ -42,12 +51,28 @@ public class Question {
 
 
     @Builder
-    private Question(String title, String description, int maxParticipants, Room room, Content content, Question parentQuestion) {
+    private Question(String title, String description, int maxParticipants, QuestionStatus status, Member host, Room room, Content content, Question parentQuestion) {
         this.title = title;
         this.description = description;
         this.maxParticipants = maxParticipants;
+        this.status = status;
+        this.host = host;
         this.room = room;
         this.content = content;
         this.parentQuestion = parentQuestion;
+    }
+
+    public static Question createFirstQuestionOf(String title, String description,int maxParticipants, Member host, Room room, Content content) {
+
+        return Question.builder()
+                .title(title)
+                .description(description)
+                .maxParticipants(maxParticipants)
+                .status(QuestionStatus.PREPARING)
+                .content(content)
+                .host(host)
+                .room(room)
+                .parentQuestion(null)
+                .build();
     }
 }

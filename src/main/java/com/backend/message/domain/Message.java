@@ -1,4 +1,4 @@
-package com.backend.message;
+package com.backend.message.domain;
 
 import com.backend.room.domain.Room;
 import com.backend.member.domain.Member;
