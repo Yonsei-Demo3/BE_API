@@ -151,7 +151,7 @@ public class JwtTokenProvider {
     public Authentication getAuthentication(String token) {
         Claims body = parser().parseClaimsJws(token).getBody();
         // subject = memberId 로 발급하고 있으니 Long으로 변환
-        Long memberId = Long.parseLong(body.getSubject());
+        String userId = body.getSubject();
         String role = body.get("role", String.class);
 
         List<GrantedAuthority> auths = (role != null)
@@ -162,7 +162,7 @@ public class JwtTokenProvider {
         String email = body.get("email", String.class);
 
         CustomUserPrincipal principal = CustomUserPrincipal.builder()
-                .memberId(memberId)
+                .userId(userId)
                 .email(email)
                 .authorities(auths)
                 .build();

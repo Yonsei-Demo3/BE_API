@@ -21,6 +21,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 import java.time.Instant;
@@ -87,12 +88,12 @@ public class AuthController {
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 리프레시 토큰입니다."));
 
         if (saved.isExpired()) {
-            refreshRepo.deleteByMemberId(saved.getMemberId()); // 만료된 기록 정리
+            refreshRepo.deleteByUserId(saved.getUserId()); // 만료된 기록 정리
             return unauthorized("invalid_token", "refresh token expired");
         }
 
         // 3) 주인(Member) 확인 후 새 토큰 세트 발급(+DB 로테이션)
-        Member owner = memberRepo.findById(saved.getMemberId())
+        Member owner = memberRepo.findByUserId(saved.getUserId())
                 .orElseThrow(() -> new IllegalStateException("해당 사용자가 존재하지 않습니다."));
 
         TokenResponseDTO newSet = authTokenService.issueTokensFor(owner); // 기존 레코드가 로테이션됨
@@ -101,6 +102,7 @@ public class AuthController {
 
     @Operation(summary = "로그아웃 → Access 블랙리스트 등록 + Refresh 제거")
     @PostMapping("/logout")
+    @Transactional
     public ResponseEntity<Void> logout(
             @RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
     
@@ -143,9 +145,9 @@ public class AuthController {
         // 4) Redis 블랙리스트 등록
         blacklist.blacklist(jti, ttl);
     
-        // 5) 토큰 subject(=memberId)로 refresh 기록 제거
-        Long memberId = Long.parseLong(tokenProvider.getSubject(accessToken));
-        refreshRepo.deleteByMemberId(memberId);
+        // 5) 토큰 subject(=userId)로 refresh 기록 제거
+        String userId = tokenProvider.getSubject(accessToken);
+        refreshRepo.deleteByUserId(userId);
     
         return ResponseEntity.noContent().build();
     }

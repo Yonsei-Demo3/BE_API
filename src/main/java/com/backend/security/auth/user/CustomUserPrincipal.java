@@ -9,20 +9,20 @@ import lombok.Builder;
 @Builder
 public class CustomUserPrincipal implements UserDetails {
 
-    private final Long memberId;
+    private final String userId;
     private final String email;
     private final Collection<? extends GrantedAuthority> authorities;
 
-    public CustomUserPrincipal(Long memberId,
+    public CustomUserPrincipal(String userId,
                                String email,
                                Collection<? extends GrantedAuthority> authorities) {
-        this.memberId = memberId;
+        this.userId = userId;
         this.email = email;
         this.authorities = authorities;
     }
 
-    public Long getMemberId() {
-        return memberId;
+    public String getUserId() {
+        return userId;
     }
 
     public String getEmail() {
