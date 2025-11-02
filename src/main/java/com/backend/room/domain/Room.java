@@ -1,4 +1,4 @@
-package com.backend.chatroom.domain;
+package com.backend.room.domain;
 
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -6,10 +6,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "chat_rooms")
+@Table(name = "rooms")
 @Getter
 @NoArgsConstructor
-public class Chatroom {
+public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,13 +20,20 @@ public class Chatroom {
     @Column(nullable = false, length = 1000)
     private String description;
 
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private RoomStatus roomStatus;
+
+    //TODO: Message도 양방향으로 추가하는 게 좋을 듯...? Base Entitiy 추가
+
     @Builder
-    private Chatroom(String name, String description) {
+    private Room(String name, String description) {
         this.name = name;
         this.description = description;
     }
 
-    public static Chatroom of(String name, String description) {
-        return new Chatroom(name, description);
+    public static Room of(String name, String description) {
+        return new Room(name, description);
     }
 }

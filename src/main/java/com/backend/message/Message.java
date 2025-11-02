@@ -1,6 +1,6 @@
 package com.backend.message;
 
-import com.backend.chatroom.domain.Chatroom;
+import com.backend.room.domain.Room;
 import com.backend.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -26,22 +26,21 @@ public class Message {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chatroom_id", nullable = false) // 9. 'chatroom_id'라는 FK 컬럼이 생성됨
-    private Chatroom chatroom;
+    private Room room;
 
-    //TODO: 양방향 관계 고민
+    //TODO: BaseEntity 추가
+
+
 
     @Builder
-    private Message(MessageType type, String content, Member member, Chatroom chatroom) {
+    private Message(MessageType type, String content, Member member, Room room) {
         this.type = type;
         this.content = content;
         this.member = member;
-        this.chatroom = chatroom;
+        this.room = room;
     }
 
-    public static Message of(MessageType type, String content, Member member, Chatroom chatroom) {
-        return new Message(type, content, member, chatroom);
+    public static Message of(MessageType type, String content, Member member, Room room) {
+        return new Message(type, content, member, room);
     }
-
-
-
 }
