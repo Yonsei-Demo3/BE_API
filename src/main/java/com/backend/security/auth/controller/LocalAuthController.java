@@ -31,7 +31,7 @@ import java.util.Optional;
 @Tag(name = "Auth", description = "인증 API (JWT + Refresh)")
 @RestController
 @RequestMapping("/api/auth")
-public class AuthController {
+public class LocalAuthController {
 
     private final MemberRepository memberRepo;
     private final RefreshTokenRepository refreshRepo;
@@ -40,7 +40,7 @@ public class AuthController {
     private final AuthTokenService authTokenService;
     private final TokenBlacklistService blacklist;
 
-    public AuthController(MemberRepository memberRepo,
+    public LocalAuthController(MemberRepository memberRepo,
                           RefreshTokenRepository refreshRepo,
                           PasswordEncoder encoder,
                           JwtTokenProvider tokenProvider,
