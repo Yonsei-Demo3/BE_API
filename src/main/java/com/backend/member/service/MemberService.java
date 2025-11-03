@@ -2,7 +2,7 @@ package com.backend.member.service;
 
 import com.backend.member.domain.Member;
 import com.backend.member.domain.Role;
-import com.backend.member.dto.SignUpRequestDTO;
+import com.backend.member.dto.LocalSignUpRequestDTO;
 import com.backend.member.dto.UpdateNicknameRequestDTO;
 import com.backend.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,26 +21,40 @@ public class MemberService {
     private final PasswordEncoder encoder;
 
     /**
-     * 회원가입 (쓰기 작업이므로 readOnly=false)
+     * 로컬 회원가입
      */
     @Transactional
-    public Member signUp(SignUpRequestDTO req) {
+    public Member signUp(LocalSignUpRequestDTO req) {
         if (repo.existsByEmail(req.email())) {
             throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
         }
 
         String encodedPw = encoder.encode(req.password());
-        Member member = Member.of(req.email(), encodedPw, req.nickname());
+
+        // UUID userId는 @PrePersist에서 자동 생성됨
+        Member member = Member.local(
+                null,               // userId (null → 자동 UUID)
+                req.email(),
+                encodedPw,
+                req.nickname()
+        );
 
         return repo.save(member);
     }
 
     /**
+     * 소셜 회원가입 (카카오 등)
+     */
+
+
+
+
+    /**
      * 회원 단일 조회 (readOnly 트랜잭션)
      */
-    public Member get(Long id) {
-        return repo.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원"));
+    public Member getByUserId(String userId) {
+        return repo.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
     }
 
     /**
@@ -54,22 +68,20 @@ public class MemberService {
      * 닉네임 변경 (쓰기 작업)
      */
     @Transactional
-    public Member changeNickname(Long myId, UpdateNicknameRequestDTO req) {
-        Member m = repo.findById(myId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원"));
-
+    public Member changeNicknameByUserId(String userId, UpdateNicknameRequestDTO req) {
+        Member m = repo.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
         m.changeNickname(req.nickname());
-        return m; // JPA Dirty Checking으로 자동 업데이트
+        return m;
     }
 
     /**
      * 관리자 승격 (어드민 기능)
      */
     @Transactional
-    public Member promoteToAdmin(Long id) {
-        Member m = repo.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원"));
-
+    public Member promoteToAdmin(String userId) {
+        Member m = repo.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
         m.changeRole(Role.ADMIN);
         return m;
     }
@@ -78,7 +90,9 @@ public class MemberService {
      * 회원 삭제
      */
     @Transactional
-    public void delete(Long myId) {
-        repo.deleteById(myId);
+    public void deleteByUserId(String userId) {
+        Member m = repo.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+        repo.delete(m);
     }
 }

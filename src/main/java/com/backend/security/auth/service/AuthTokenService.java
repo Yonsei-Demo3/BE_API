@@ -10,6 +10,8 @@ import com.backend.security.util.HashUtil;
 import com.backend.security.auth.dto.TokenResponseDTO;
 import com.backend.security.auth.jwt.JwtTokenProvider;
 import com.backend.security.auth.repository.RefreshTokenRepository;
+import org.springframework.transaction.annotation.Transactional;
+
 
 @Service
 public class AuthTokenService {
@@ -28,25 +30,26 @@ public class AuthTokenService {
      * refresh 토큰을 DB에 upsert/rotate 한 다음
      * 클라이언트에게 내려줄 TokenResponseDTO로 변환해 돌려준다.
      */
+    @Transactional
     public TokenResponseDTO issueTokensFor(Member member) {
 
+        final String userId = member.getUserId();
+
         // 1️⃣ Access / Refresh 토큰 생성
-        String access  = tokenProvider.createAccessToken(String.valueOf(member.getId()), member.getRole().name());
-        String refresh = tokenProvider.createRefreshToken(String.valueOf(member.getId()));
+        String access  = tokenProvider.createAccessToken(userId, member.getRole().name());
+        String refresh = tokenProvider.createRefreshToken(userId);
 
         // 2️⃣ Refresh 토큰 해시 계산
         String refreshHash = HashUtil.sha256Base64(refresh);
-        System.out.println("[LOGIN] memberId=" + member.getId()
-        + " refreshHash=" + refreshHash.substring(0, 12) + "...");
 
-
+        System.out.println("[LOGIN] userId=" + userId
+                + " refreshHash=" + refreshHash.substring(0, 12) + "...");
 
         /// 3️⃣ 만료 시각 계산
         Instant refreshExp = Instant.now().plus(tokenProvider.getRefreshValidity());
 
         // 4️⃣ DB에 저장 (있으면 rotate, 없으면 새로 생성)
-        Long memberId = Long.valueOf(member.getId());
-        refreshRepo.findByMemberId(memberId)
+        refreshRepo.findByUserId(userId)
         .ifPresentOrElse(
                 rt -> {
                     System.out.println("[LOGIN] rotate existing RT row, id=" + rt.getId());
@@ -55,7 +58,7 @@ public class AuthTokenService {
                 },
                 () -> {
                     System.out.println("[LOGIN] insert new RT row");
-                    refreshRepo.save(new RefreshToken(memberId, refreshHash, refreshExp));
+                    refreshRepo.save(new RefreshToken(userId, refreshHash, refreshExp));
                 }
             );
 

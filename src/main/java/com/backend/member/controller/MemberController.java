@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import com.backend.member.domain.Member;
-import com.backend.member.dto.SignUpRequestDTO;
+import com.backend.member.dto.LocalSignUpRequestDTO;
 import com.backend.member.dto.UpdateNicknameRequestDTO;
 import com.backend.member.dto.MemberResponseDTO;
 import com.backend.member.service.MemberService;
@@ -34,15 +34,15 @@ public class MemberController {
 
     @Operation(summary = "회원 가입")
     @PostMapping
-    public ResponseEntity<MemberResponseDTO> signUp(@Valid @RequestBody SignUpRequestDTO req) {
+    public ResponseEntity<MemberResponseDTO> signUp(@Valid @RequestBody LocalSignUpRequestDTO req) {
         Member saved = memberService.signUp(req);
         return ResponseEntity.ok(MemberResponseDTO.from(saved));
     }
 
     @Operation(summary = "회원 단일 조회")
     @GetMapping("/{id}")
-    public ResponseEntity<MemberResponseDTO> get(@PathVariable Long id) {
-        Member found = memberService.get(id);
+    public ResponseEntity<MemberResponseDTO> get(@PathVariable String userId) {
+        Member found = memberService.getByUserId(userId);
         return ResponseEntity.ok(MemberResponseDTO.from(found));
     }
 
@@ -61,8 +61,8 @@ public class MemberController {
         @AuthenticationPrincipal CustomUserPrincipal me,
         @Valid @RequestBody UpdateNicknameRequestDTO req
     ) {
-        Long myId = me.getMemberId();
-        Member updated = memberService.changeNickname(myId, req);
+        String myUserId = me.getUserId();
+        Member updated = memberService.changeNicknameByUserId(myUserId, req);
         return ResponseEntity.ok(MemberResponseDTO.from(updated));
     }
     
@@ -71,17 +71,16 @@ public class MemberController {
     public ResponseEntity<Void> deleteMe(
         @AuthenticationPrincipal CustomUserPrincipal me
     ) {
-        Long myId = me.getMemberId();
-        memberService.delete(myId);
+        String myUserId = me.getUserId();
+        memberService.deleteByUserId(myUserId);
         return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "내 정보 조회")
     @GetMapping("/me")
-    public ResponseEntity<MemberResponseDTO> getMe(
-        @AuthenticationPrincipal CustomUserPrincipal me
-    ) {
-        Member found = memberService.get(me.getMemberId());
+    public ResponseEntity<MemberResponseDTO> getMe(@AuthenticationPrincipal CustomUserPrincipal me) {
+        if (me == null) return ResponseEntity.status(401).build();
+        Member found = memberService.getByUserId(me.getUserId());
         return ResponseEntity.ok(MemberResponseDTO.from(found));
     }
 }

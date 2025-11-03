@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Entity
 @Table(name = "refresh_tokens", indexes = {
-        @Index(name = "idx_refresh_member", columnList = "memberId", unique = true),
+        @Index(name = "idx_refresh_member", columnList = "userId", unique = true),
         @Index(name = "idx_refresh_token", columnList = "tokenHash", unique = true)
 })
 
@@ -18,7 +18,7 @@ public class RefreshToken {
     private Long id;
 
     @Column(nullable = false)
-    private Long memberId;
+    private String userId;
 
     @Column(nullable=false, length = 500)
     private String tokenHash;
@@ -28,8 +28,8 @@ public class RefreshToken {
 
     protected RefreshToken() {}
 
-    public RefreshToken(Long memberId, String tokenHash, Instant expiresAt) {
-        this.memberId = memberId;
+    public RefreshToken(String userId, String tokenHash, Instant expiresAt) {
+        this.userId = userId;
         this.tokenHash = tokenHash;
         this.expiresAt = expiresAt;
     }
