@@ -19,7 +19,7 @@ public class KakaoLoginPageController {
     @Value("${app.oauth.kakao.client-id:dummy}")
     private String clientId;
 
-    @Value("${app.oauth.kakao.redirect-uri:http://localhost:8080/api/auth/oauth/kakao/callback}")
+    @Value("${app.oauth.kakao.redirect-uri:http://localhost:8080/api/v1/auth/oauth/kakao/callback}")
     private String redirectUri;
 
     @GetMapping("/page")
