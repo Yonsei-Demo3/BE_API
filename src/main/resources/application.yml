@@ -4,6 +4,10 @@ server:
 spring:
   application:
     name: be-api
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
 
 springdoc:
   swagger-ui:
@@ -13,6 +17,13 @@ springdoc:
 
 app:
   jwt:
-    access-token-validity-ms: 3600000
+    secret: "WlV5b1p3ZjlxQmJvRzZyOXpZK0FteS1wSFh3czZfV2h5Zk1wbUhYd2s5S0pU"
+    issuer: my-backend-api
+    audience: web
+    access-token-validity-ms: 900000
     refresh-token-validity-ms: 1209600000
-    secret: VlwEyVBsYt9V7zq57TejMnVUyzblYcfPQye08f7MGVA9XkHa #임시 64bytes random secret. 실제 배포 환경에서는 .env에 설정할 것.
+    clock-skew-sec: 60
+
+logging:
+  level:
+    org.springframework.security: DEBUG
