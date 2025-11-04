@@ -33,6 +33,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/members").permitAll() // 회원가입 공개
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/error").permitAll()
+                .requestMatchers("/api/auth/oauth/kakao/**").permitAll()
+                .requestMatchers("/page", "/callback", "/api/auth/oauth/kakao/callback").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")             // 관리자 전용
                 .anyRequest().authenticated()
             )
