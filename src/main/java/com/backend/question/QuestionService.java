@@ -11,17 +11,24 @@ import com.backend.question.dto.response.CreateQuestionResponseDTO;
 import com.backend.question.repository.QuestionRepository;
 import com.backend.room.domain.Room;
 import com.backend.room.repository.RoomRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class QuestionService {
 
-    private QuestionRepository questionRepository;
-    private ContentRepository contentRepository;
-    private RoomRepository roomRepository;
-    private MemberRepository memberRepository;
+    private final QuestionRepository questionRepository;
+    private final ContentRepository contentRepository;
+    private final RoomRepository roomRepository;
+    private final MemberRepository memberRepository;
 
     //TODO: Security 반영
-    public CreateQuestionResponseDTO createFirstQuestion(Long hostId, CreateFirstQuestionRequestDTO dto) {
-        Member host = memberRepository.findById(hostId)
+    @Transactional
+    public CreateQuestionResponseDTO createFirstQuestion(String hostUserId, CreateFirstQuestionRequestDTO dto) {
+        Member host = memberRepository.findByUserId(hostUserId)
                 .orElseThrow(() -> new RuntimeException("member not found"));
 
 
