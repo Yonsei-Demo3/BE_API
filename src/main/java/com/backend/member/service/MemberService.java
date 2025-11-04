@@ -43,13 +43,6 @@ public class MemberService {
     }
 
     /**
-     * 소셜 회원가입 (카카오 등)
-     */
-
-
-
-
-    /**
      * 회원 단일 조회 (readOnly 트랜잭션)
      */
     public Member getByUserId(String userId) {

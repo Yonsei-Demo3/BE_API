@@ -8,6 +8,8 @@ spring:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
+  thymeleaf:
+    cache: false
 
 springdoc:
   swagger-ui:
@@ -23,6 +25,12 @@ app:
     access-token-validity-ms: 900000
     refresh-token-validity-ms: 1209600000
     clock-skew-sec: 60
+  oauth:
+    kakao:
+      client-id: ${KAKAO_REST_API_KEY}
+      redirect-uri: ${KAKAO_REDIRECT_URI}
+      client-secret: ""
+      admin-key: ""
 
 logging:
   level:
