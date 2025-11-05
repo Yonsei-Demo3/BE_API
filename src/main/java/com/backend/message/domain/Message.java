@@ -4,10 +4,12 @@ import com.backend.room.domain.Room;
 import com.backend.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor
+@Getter
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +27,7 @@ public class Message {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "chatroom_id", nullable = false) // 9. 'chatroom_id'라는 FK 컬럼이 생성됨
+    @JoinColumn(name = "room_id", nullable = false) // 9. 'room_id'라는 FK 컬럼이 생성됨
     private Room room;
 
     //TODO: BaseEntity 추가

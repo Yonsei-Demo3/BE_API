@@ -1,5 +1,9 @@
 package com.backend.room.service;
 
+import com.backend.message.domain.Message;
+import com.backend.message.dto.MessageResponseDTO;
+import com.backend.message.repository.MessageRepository;
+import com.backend.question.repository.QuestionRepository;
 import com.backend.room.domain.Room;
 import com.backend.room.dto.RoomDTO;
 import com.backend.room.repository.RoomRepository;
@@ -14,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class RoomService {
     private final RoomRepository roomRepository;
+    private final MessageRepository messageRepository;
+    private final QuestionRepository questionRepository;
 
     // TODO: Create는 Question에서 만들기. Question이 생겨야 질문이 생기는 게 맞는 거 같음
 
@@ -33,5 +39,11 @@ public class RoomService {
                 .orElseThrow(() -> new RuntimeException("채팅방을 찾을 수 없습니다. ID: " + id));
 
         return RoomDTO.from(room);
+    }
+
+    public Page<MessageResponseDTO> listMessages(Long roomId, Pageable pageable) {
+        //TODO: 자기가 소속된 채팅방인지 확인하는 로직추가
+        Page<Message> messagePage = messageRepository.findByRoomId(roomId, pageable);
+        return messagePage.map(MessageResponseDTO::from);
     }
 }
