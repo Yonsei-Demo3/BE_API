@@ -8,9 +8,12 @@ import com.backend.member.repository.MemberRepository;
 import com.backend.question.domain.Question;
 import com.backend.question.dto.request.CreateFirstQuestionRequestDTO;
 import com.backend.question.dto.response.CreateQuestionResponseDTO;
+import com.backend.question.dto.response.QuestionResponseDTO;
 import com.backend.question.repository.QuestionRepository;
 import com.backend.room.domain.Room;
 import com.backend.room.repository.RoomRepository;
+import com.backend.roomMember.domain.RoomMember;
+import com.backend.roomMember.repository.RoomMemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,8 +27,8 @@ public class QuestionService {
     private final ContentRepository contentRepository;
     private final RoomRepository roomRepository;
     private final MemberRepository memberRepository;
+    private final RoomMemberRepository roomMemberRepository;
 
-    //TODO: Security 반영
     @Transactional
     public CreateQuestionResponseDTO createFirstQuestion(String hostUserId, CreateFirstQuestionRequestDTO dto) {
         Member host = memberRepository.findByUserId(hostUserId)
@@ -39,6 +42,11 @@ public class QuestionService {
         Room newRoom = new Room();
         roomRepository.save(newRoom);
 
+        //RoomMember 테이블에 호스트 추가
+        RoomMember newMember = RoomMember.of(newRoom, host);
+        roomMemberRepository.save(newMember);
+
+
         Question question = Question.createFirstQuestionOf(
                 dto.title(),
                 dto.description(),
@@ -51,6 +59,30 @@ public class QuestionService {
 
         return CreateQuestionResponseDTO.from(question);
     }
+
+
+    //질문 참여
+    @Transactional
+    public QuestionResponseDTO participateQuestion(String hostUserId, Long questionId) {
+        Member participants = memberRepository.findByUserId(hostUserId)
+                .orElseThrow(() -> new RuntimeException("member not found"));
+
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new RuntimeException("question not found"));
+
+        Room room = question.getRoom();
+
+        if(roomMemberRepository.existsByRoomAndMember(room, participants)) {
+            throw new RuntimeException("이미 참가한 질문 채팅방입니다.");
+        }
+
+        RoomMember newMember = RoomMember.of(room, participants);
+        roomMemberRepository.save(newMember);
+
+        return QuestionResponseDTO.from(question);
+    }
+
+
 
 
 }
