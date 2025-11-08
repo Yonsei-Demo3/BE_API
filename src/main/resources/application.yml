@@ -4,12 +4,22 @@ server:
 spring:
   application:
     name: be-api
+
   data:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
   thymeleaf:
     cache: false
+  
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc.time_zone: Asia/Seoul
+    hibernate:
+      ddl-auto: update
 
 springdoc:
   swagger-ui:
@@ -35,3 +45,5 @@ app:
 logging:
   level:
     org.springframework.security: DEBUG
+    org.hibernate.SQL: debug
+    org.hibernate.orm.jdbc.bind: trace
