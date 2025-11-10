@@ -1,9 +1,7 @@
 package com.backend.room.domain;
 
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "rooms")
