@@ -1,5 +1,6 @@
 package com.backend.category.domain;
 
+import com.backend.categoryContent.CategoryContent;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,6 +38,7 @@ public class Category {
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Category> children = new ArrayList<>();
+
 
     @Builder
     private Category(String name, Category parent) {
