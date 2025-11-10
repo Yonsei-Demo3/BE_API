@@ -10,6 +10,23 @@ spring:
       port: ${REDIS_PORT:6379}
   thymeleaf:
     cache: false
+  datasource:
+    url: jdbc:mysql://localhost:${DB_PORT}/${DB_NAME}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+    hibernate:
+        # 6. (중요) 'create'나 'update'로 설정
+        #    'create': 매번 서버 켤 때마다 테이블 전부 드랍하고 새로 만듦 (데이터 삭제됨)
+        #    'update': 엔티티 변경점만 감지해서 DB에 반영 (데이터 유지됨)
+      ddl-auto: update
+
+
 
 springdoc:
   swagger-ui:

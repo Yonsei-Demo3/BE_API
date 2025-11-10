@@ -31,7 +31,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/healthz", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/members").permitAll() // 회원가입 공개
-                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/v1/auth/**").permitAll()
                 .requestMatchers("/error").permitAll()
                 .requestMatchers("/api/auth/oauth/kakao/**").permitAll()
                 .requestMatchers("/page", "/callback", "/api/auth/oauth/kakao/callback").permitAll()

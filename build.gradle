@@ -47,7 +47,7 @@ dependencies {
 
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	
-	runtimeOnly 'com.h2database:h2'
+	//runtimeOnly 'com.h2database:h2'
     testImplementation 'com.h2database:h2'
 
 	implementation "me.paulschwarz:spring-dotenv:4.0.0"
