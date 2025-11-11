@@ -4,6 +4,7 @@ import com.backend.category.CategoryProperties;
 import com.backend.category.domain.Category;
 import com.backend.category.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryProperties categoryProperties;
@@ -38,6 +40,6 @@ public class CategoryService {
                 }
             }
         }
-        System.out.println("Category data seeding from YML completed.");
+        log.info("Categories loaded successfully");
     }
 }

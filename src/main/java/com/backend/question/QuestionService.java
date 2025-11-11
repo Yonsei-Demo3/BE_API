@@ -64,10 +64,10 @@ public class QuestionService {
         );
         Question savedQuestion = questionRepository.save(question);
 
-        List<Tag> tagEntities = tagService.findOrCreateTags(dto.tags());
+        List<Tag> tagEntities = tagService.findOrCreateTags(dto.tags() != null ? dto.tags() : java.util.Collections.emptyList());
 
         for (Tag tag : tagEntities) {
-            TagQuestion newTagQuestion = TagQuestion.of(tag,savedQuestion);
+            TagQuestion newTagQuestion = TagQuestion.of(tag, savedQuestion);
             tagQuestionRepository.save(newTagQuestion);
         }
         //TODO: DTO에 태그 반영

@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 
 //TODO: 유니크 제약 조건을 걸어야 할까?
 @Entity
-@Table(name = "categry_contents")
+@Table(name = "category_contents")
 @NoArgsConstructor
 @Getter
 public class CategoryContent {
