@@ -1,4 +1,4 @@
-package com.backend.question;
+package com.backend.question.service;
 
 import com.backend.content.domain.Content;
 import com.backend.content.repository.ContentRepository;
@@ -7,6 +7,7 @@ import com.backend.member.repository.MemberRepository;
 import com.backend.question.domain.Question;
 import com.backend.question.dto.request.CreateFirstQuestionRequestDTO;
 import com.backend.question.dto.response.CreateQuestionResponseDTO;
+import com.backend.question.dto.response.QuestionDetailResponseDTO;
 import com.backend.question.dto.response.QuestionResponseDTO;
 import com.backend.question.repository.QuestionRepository;
 import com.backend.room.domain.Room;
@@ -14,6 +15,7 @@ import com.backend.room.repository.RoomRepository;
 import com.backend.roomMember.domain.RoomMember;
 import com.backend.roomMember.repository.RoomMemberRepository;
 import com.backend.tag.Tag;
+import com.backend.tag.TagRepository;
 import com.backend.tag.TagService;
 import com.backend.tagQuestion.TagQuestion;
 import com.backend.tagQuestion.TagQuestionRepository;
@@ -93,5 +95,18 @@ public class QuestionService {
         roomMemberRepository.save(newMember);
 
         return QuestionResponseDTO.from(question);
+    }
+
+    //TODO: 질문 상세 조회
+    public QuestionDetailResponseDTO getQuestionDetailById(Long questionId) {
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new RuntimeException("question not found"));
+
+        List<Tag> tags = tagQuestionRepository.findAllByQuestion(question)
+                .stream()
+                .map(TagQuestion::getTag)
+                .toList();
+
+        return QuestionDetailResponseDTO.from(question, tags);
     }
 }
