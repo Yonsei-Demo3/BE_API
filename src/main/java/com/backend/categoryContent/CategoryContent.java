@@ -14,6 +14,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+//TODO: 유니크 제약 조건을 걸어야 할까?
 @Entity
 @Table(name = "categry_contents")
 @NoArgsConstructor
