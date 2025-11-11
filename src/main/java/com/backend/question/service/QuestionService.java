@@ -7,6 +7,7 @@ import com.backend.member.repository.MemberRepository;
 import com.backend.question.domain.Question;
 import com.backend.question.dto.request.CreateFirstQuestionRequestDTO;
 import com.backend.question.dto.response.CreateQuestionResponseDTO;
+import com.backend.question.dto.response.QuestionDTO;
 import com.backend.question.dto.response.QuestionDetailResponseDTO;
 import com.backend.question.dto.response.QuestionResponseDTO;
 import com.backend.question.repository.QuestionRepository;
@@ -76,9 +77,10 @@ public class QuestionService {
         return CreateQuestionResponseDTO.from(question);
     }
 
+    //TODO: 참여하면 어디로?
     //질문 참여
     @Transactional
-    public QuestionResponseDTO participateQuestion(String hostUserId, Long questionId) {
+    public QuestionDTO participateQuestion(String hostUserId, Long questionId) {
         Member participants = memberRepository.findByUserId(hostUserId)
                 .orElseThrow(() -> new RuntimeException("member not found"));
 
@@ -94,7 +96,7 @@ public class QuestionService {
         RoomMember newMember = RoomMember.of(room, participants);
         roomMemberRepository.save(newMember);
 
-        return QuestionResponseDTO.from(question);
+        return QuestionDTO.from(question);
     }
 
     //TODO: 질문 상세 조회
@@ -109,4 +111,6 @@ public class QuestionService {
 
         return QuestionDetailResponseDTO.from(question, tags);
     }
+
+    //TODO: 검색
 }

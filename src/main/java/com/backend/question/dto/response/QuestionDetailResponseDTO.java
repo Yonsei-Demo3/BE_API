@@ -12,13 +12,14 @@ public record QuestionDetailResponseDTO(
         List<String> tags,
         String questionTitle,
         String description,
-        String hostNickname
+        String hostNickname,
+        String imageUrl
 ) {
     public static QuestionDetailResponseDTO from(Question question, List<Tag> tags) {
         List<String> tagNames = tags.stream()
                 .map(Tag::getName)
                 .toList();
 
-        return new QuestionDetailResponseDTO(question.getId(), question.getContent().getName(),tagNames, question.getTitle(), question.getDescription(), question.getHost().getNickname());
+        return new QuestionDetailResponseDTO(question.getId(), question.getContent().getName(),tagNames, question.getTitle(), question.getDescription(), question.getHost().getNickname(), question.getContent().getImageUrl());
     }
 }

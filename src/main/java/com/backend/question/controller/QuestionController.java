@@ -1,5 +1,6 @@
 package com.backend.question.controller;
 
+import com.backend.question.dto.response.QuestionDTO;
 import com.backend.question.dto.response.QuestionDetailResponseDTO;
 import com.backend.question.service.QuestionService;
 import com.backend.question.dto.request.CreateFirstQuestionRequestDTO;
@@ -26,8 +27,8 @@ public class QuestionController {
     }
 
     @PostMapping("/{questionId}")
-    public ResponseEntity<QuestionResponseDTO> participateQuestion(@AuthenticationPrincipal CustomUserPrincipal me, @PathVariable Long questionId) {
-        QuestionResponseDTO responseDTO = questionService.participateQuestion(me.getUserId(), questionId);
+    public ResponseEntity<QuestionDTO> participateQuestion(@AuthenticationPrincipal CustomUserPrincipal me, @PathVariable Long questionId) {
+        QuestionDTO responseDTO = questionService.participateQuestion(me.getUserId(), questionId);
         return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
     }
 
