@@ -1,5 +1,6 @@
 package com.backend.question.controller;
 
+import com.backend.question.dto.request.QuestionSearchRequestDTO;
 import com.backend.question.dto.response.QuestionDTO;
 import com.backend.question.dto.response.QuestionDetailResponseDTO;
 import com.backend.question.service.QuestionService;
@@ -8,10 +9,16 @@ import com.backend.question.dto.response.CreateQuestionResponseDTO;
 import com.backend.question.dto.response.QuestionResponseDTO;
 import com.backend.security.auth.user.CustomUserPrincipal;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/questions")
@@ -37,4 +44,16 @@ public class QuestionController {
         QuestionDetailResponseDTO responseDTO = questionService.getQuestionDetailById(questionId);
         return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
     }
+
+    /*
+    @PostMapping("/search")
+    public ResponseEntity<Page<QuestionResponseDTO>> searchQuestions(
+            @RequestBody QuestionSearchRequestDTO questionSearchRequestDTO,
+            @PageableDefault(size = 20, sort = "id", direction = Sort.Direction.DESC)
+            Pageable pageable
+    ) {
+        Page<QuestionResponseDTO> responses =
+
+    }
+     */
 }
