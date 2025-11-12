@@ -6,6 +6,7 @@ import com.backend.member.domain.Member;
 import com.backend.member.repository.MemberRepository;
 import com.backend.question.domain.Question;
 import com.backend.question.dto.request.CreateFirstQuestionRequestDTO;
+import com.backend.question.dto.request.QuestionSearchRequestDTO;
 import com.backend.question.dto.response.CreateQuestionResponseDTO;
 import com.backend.question.dto.response.QuestionDTO;
 import com.backend.question.dto.response.QuestionDetailResponseDTO;
@@ -21,6 +22,8 @@ import com.backend.tag.TagService;
 import com.backend.tagQuestion.TagQuestion;
 import com.backend.tagQuestion.TagQuestionRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +41,7 @@ public class QuestionService {
     private final RoomMemberRepository roomMemberRepository;
     private final TagService tagService;
     private final TagQuestionRepository tagQuestionRepository;
+    private final QuestionDtoAssembler questionDtoAssembler;
 
     @Transactional
     public CreateQuestionResponseDTO createFirstQuestion(String hostUserId, CreateFirstQuestionRequestDTO dto) {
@@ -113,4 +117,8 @@ public class QuestionService {
     }
 
     //TODO: 검색
+    public Page<QuestionResponseDTO> searchQuestions(QuestionSearchRequestDTO dto, Pageable pageable) {
+        Page<Question> questionPage = questionRepository.search(dto, pageable);
+        return questionDtoAssembler.toPageDto(questionPage);
+    }
 }

@@ -45,15 +45,16 @@ public class QuestionController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
     }
 
-    /*
+
     @PostMapping("/search")
     public ResponseEntity<Page<QuestionResponseDTO>> searchQuestions(
             @RequestBody QuestionSearchRequestDTO questionSearchRequestDTO,
             @PageableDefault(size = 20, sort = "id", direction = Sort.Direction.DESC)
             Pageable pageable
     ) {
-        Page<QuestionResponseDTO> responses =
+        Page<QuestionResponseDTO> responses =  questionService.searchQuestions(questionSearchRequestDTO, pageable);
+        return ResponseEntity.status(HttpStatus.OK).body(responses);
 
     }
-     */
+
 }

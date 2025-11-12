@@ -22,11 +22,16 @@ public record QuestionResponseDTO(
         List<String> tagNames = tags.stream()
                 .map(Tag::getName)
                 .toList();
-        String subCategoryName = subCategory.getName();
-        // 3. (안전하게) 부모가 null인지 체크
-        String mainCategoryName = (subCategory.getParent() != null)
-                ? subCategory.getParent().getName()
-                : "N/A";
+
+        String subCategoryName = "N/A";
+        String mainCategoryName = "N/A";
+
+        if (subCategory != null) {
+            subCategoryName = subCategory.getName();
+            mainCategoryName = (subCategory.getParent() != null)
+                    ? subCategory.getParent().getName()
+                    : "N/A"; // 부모가 없는 경우 (최상위 카테고리인 경우)
+        }
 
         return new QuestionResponseDTO(
                 question.getId(),

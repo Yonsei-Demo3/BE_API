@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface TagQuestionRepository extends JpaRepository<TagQuestion, Long> {
     List<TagQuestion> findAllByQuestion(Question question);
+    List<TagQuestion> findAllByQuestionIn(List<Question> questions);
+
 }

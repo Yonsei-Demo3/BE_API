@@ -62,6 +62,24 @@ dependencies {
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 }
 
+def querydslDir = file('build/generated/querydsl')
+
+tasks.withType(JavaCompile) {
+    options.getGeneratedSourceOutputDirectory().set(querydslDir)
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ["src/main/java", querydslDir]
+        }
+    }
+}
+
+clean {
+    delete querydslDir
+}
+
 tasks.named('test') {
 	useJUnitPlatform()
 }
