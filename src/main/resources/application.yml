@@ -4,6 +4,12 @@ server:
 spring:
   application:
     name: be-api
+  
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${DB_HOST:terraform-20251109100457409000000001.clsgkaq0246t.ap-northeast-2.rds.amazonaws.com}:${DB_PORT:3306}/${DB_NAME:demo}?characterEncoding=UTF-8&serverTimezone=Asia/Seoul
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
   data:
     redis:
@@ -47,4 +53,3 @@ logging:
     org.springframework.security: DEBUG
     org.hibernate.SQL: debug
     org.hibernate.orm.jdbc.bind: trace
-
