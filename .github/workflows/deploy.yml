@@ -1,0 +1,88 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - 'BE_API/**'
+      - '.github/workflows/**'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-ec2-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build & Push Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./BE_API
+          file: ./BE_API/Dockerfile
+          push: true
+          platforms: linux/amd64
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/sai-api:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/sai-api:${{ github.sha }}
+          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/sai-api:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/sai-api:buildcache,mode=max
+
+      - name: SSH into EC2 & Deploy
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          timeout: 600s
+          script: |
+            set -euxo pipefail
+
+            cd ~/sai-server
+
+            echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+            docker compose pull
+            docker compose up -d --remove-orphans
+
+            echo "Checking service health..."
+            for i in $(seq 1 40); do
+              if curl -fsS http://localhost:8080/healthz >/dev/null 2>&1; then
+                echo "Service OK"
+                break
+              fi
+              echo "Waiting for service... ($i)"
+              sleep 2
+            done
+
+            docker image prune -af || true
+
+      - name: Show running containers
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          script: |
+            cd ~/sai-server
+            docker compose ps
+            docker compose logs --tail=50 || true
