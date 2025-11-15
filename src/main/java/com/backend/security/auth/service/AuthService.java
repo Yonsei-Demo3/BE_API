@@ -5,7 +5,6 @@ import com.backend.member.repository.MemberRepository;
 import com.backend.security.auth.blacklist.TokenBlacklistService;
 import com.backend.security.auth.domain.RefreshToken;
 import com.backend.security.auth.dto.LoginRequestDTO;
-import com.backend.security.auth.dto.RefreshRequestDTO;
 import com.backend.security.auth.dto.TokenIssueResultDTO;
 import com.backend.security.auth.exception.AuthError;
 import com.backend.security.auth.jwt.JwtTokenProvider;
@@ -47,8 +46,13 @@ public class AuthService {
 
     /** 재발급: refresh 검증 → DB 해시 매치 → 로테이션 발급 */
     @Transactional
-    public TokenIssueResultDTO refresh(RefreshRequestDTO req) {
-        final String oldRefresh = req.refreshToken();
+    public TokenIssueResultDTO refresh(String refreshToken) {
+
+        if (refreshToken == null || refreshToken.isBlank()) {
+            throw new AuthError("INVALID_REFRESH_TOKEN", "Refresh token is missing");
+        }
+
+        final String oldRefresh = refreshToken;
         final String oldRefreshHash = HashUtil.sha256Base64(oldRefresh);
 
         JwtValidationResult vr = tokenProvider.validateAndClassify(oldRefresh, Set.of("web"));

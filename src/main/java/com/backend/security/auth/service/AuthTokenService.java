@@ -1,6 +1,5 @@
 package com.backend.security.auth.service;
 
-import java.time.Duration;
 import java.time.Instant;
 
 import org.springframework.stereotype.Service;
@@ -29,7 +28,7 @@ public class AuthTokenService {
     /**
      * 주어진 회원에 대해 access/refresh 토큰을 생성하고
      * refresh 토큰을 DB에 upsert/rotate 한 다음
-     * 클라이언트에게 내려줄 TokenResponseDTO로 변환해 돌려준다.
+     * 클라이언트에게 내려줄 TokenIssueResultDTO로 변환해 돌려준다.
      */
     @Transactional
     public TokenIssueResultDTO issueTokensFor(Member member) {
@@ -47,13 +46,10 @@ public class AuthTokenService {
                 + " refreshHash=" + refreshHash.substring(0, 12) + "...");
 
         /// 3️⃣ 만료 시각 계산 
-        Duration accessValidity  = tokenProvider.getAccessValidity();
-        Duration refreshValidity = tokenProvider.getRefreshValidity();
+        long accessExpiresInSec   = tokenProvider.getAccessValidity().toSeconds();
+        long refreshExpiresInSec = tokenProvider.getRefreshValidity().toSeconds();
 
-        long accessExpiresInSec  = accessValidity.toSeconds();
-        long refreshExpiresInSec = refreshValidity.toSeconds();
-
-        Instant refreshExp = Instant.now().plus(refreshValidity);
+        Instant refreshExp = Instant.now().plusSeconds(refreshExpiresInSec);
 
         // 4️⃣ DB에 저장 (있으면 rotate, 없으면 새로 생성)
         refreshRepo.findByUserId(userId)

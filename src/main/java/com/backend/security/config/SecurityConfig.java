@@ -33,7 +33,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/v1/members").permitAll() // 회원가입 공개
                 .requestMatchers("/api/v1/auth/**").permitAll()
                 .requestMatchers("/error").permitAll()
-                .requestMatchers("/api/auth/v1/oauth/kakao/**").permitAll()
+                .requestMatchers("/api/v1/auth/oauth/kakao/**").permitAll()
                 .requestMatchers("/page", "/callback", "/api/v1/auth/oauth/kakao/callback").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")             // 관리자 전용
                 .anyRequest().authenticated()
