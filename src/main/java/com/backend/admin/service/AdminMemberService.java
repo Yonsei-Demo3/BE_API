@@ -29,6 +29,7 @@ public class AdminMemberService {
      * 🔹 특정 회원 조회
      * @param memberId 조회할 회원 ID
      */
+    @SuppressWarnings("null")
     public Member findMemberById(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID의 회원이 존재하지 않습니다."));
@@ -48,6 +49,7 @@ public class AdminMemberService {
      * 🔹 회원 삭제
      * @param memberId 삭제할 회원 ID
      */
+    @SuppressWarnings("null")
     public void deleteMember(Long memberId) {
         Member member = findMemberById(memberId);
         memberRepository.delete(member);

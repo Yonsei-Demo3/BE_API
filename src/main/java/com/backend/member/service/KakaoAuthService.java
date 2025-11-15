@@ -20,6 +20,7 @@ public class KakaoAuthService {
      * - password: 소셜은 로그인에 쓰지 않지만 null 금지를 위해 더미 해시 저장
      */
     @Transactional
+    @SuppressWarnings("null")
     public Member upsertKakaoUser(String socialId, String email, String nickname, String profileImageUrl) {
         return memberRepo.findBySocialProviderAndSocialId(SocialProvider.KAKAO, socialId)
                 .map(m -> {

@@ -1,8 +1,8 @@
 package com.backend.security.auth.controller;
 
 import com.backend.security.auth.dto.LoginRequestDTO;
-import com.backend.security.auth.dto.RefreshRequestDTO;
-import com.backend.security.auth.dto.TokenResponseDTO;
+import com.backend.security.auth.dto.TokenIssueResultDTO;
+import com.backend.security.auth.dto.AccessTokenResponseDTO;
 import com.backend.security.auth.exception.AuthError;
 import com.backend.security.auth.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,41 +15,70 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseCookie;
 
 @Tag(name = "Auth", description = "인증 API (JWT + Refresh)")
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
-public class LocalAuthController {
+public class LocalAuthController {      
 
     private final AuthService authService;
+    private static final String REFRESH_COOKIE_NAME = "refreshToken";
 
-    @Operation(summary = "로그인 → Access/Refresh 동시 발급")
+    @Operation(summary = "로그인 → Access는 바디, Refresh는 HttpOnly 쿠키로 발급")
     @PostMapping("/login")
-    public ResponseEntity<TokenResponseDTO> login(@RequestBody LoginRequestDTO req) {
+    public ResponseEntity<AccessTokenResponseDTO> login(@RequestBody LoginRequestDTO req) {
         try {
-            return ResponseEntity.ok(authService.login(req));
+            TokenIssueResultDTO issued = authService.login(req);
+
+            // Refresh는 HttpOnly 쿠키로 내려보내기
+            ResponseCookie refreshCookie = ResponseCookie.from(REFRESH_COOKIE_NAME, issued.refreshToken())
+                    .httpOnly(true)
+                    .secure(true)          // HTTPS 전제
+                    .path("/")
+                    .maxAge(issued.refreshTokenExpiresIn())
+                    .sameSite("Lax")
+                    .build();
+
+            // Access 토큰은 응답 바디로
+            AccessTokenResponseDTO body = new AccessTokenResponseDTO(
+                    issued.accessToken(),
+                    "Bearer",
+                    issued.accessTokenExpiresIn()
+            );
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                    .body(body);
+
         } catch (AuthError e) {
+            // 여기서 T = AccessTokenResponseDTO 로 추론됨
             return unauthorized(e.getCode(), e.getDesc());
         }
     }
 
-    @Operation(summary = "재발급 → Access 교체, Refresh 로테이션(보안 권장)")
-    @PostMapping("/refresh")
-    public ResponseEntity<TokenResponseDTO> refresh(@RequestBody RefreshRequestDTO req) {
-        try {
-            return ResponseEntity.ok(authService.refresh(req));
-        } catch (AuthError e) {
-            return unauthorized(e.getCode(), e.getDesc());
-        }
-    }
-
-    @Operation(summary = "로그아웃 → Access 블랙리스트 등록 + Refresh 제거")
+    @Operation(summary = "로그아웃 → Access 블랙리스트 등록 + Refresh 쿠키 제거")
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
+    public ResponseEntity<Void> logout(
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader
+    ) {
         try {
             authService.logout(authorizationHeader);
-            return ResponseEntity.noContent().build();
+
+            // refreshToken 쿠키 즉시 만료 시키기
+            ResponseCookie deleteRefreshCookie = ResponseCookie.from(REFRESH_COOKIE_NAME, "")
+                    .httpOnly(true)
+                    .secure(true)
+                    .path("/")
+                    .maxAge(0)          // 즉시 만료
+                    .sameSite("Lax")
+                    .build();
+
+            return ResponseEntity.noContent()
+                    .header(HttpHeaders.SET_COOKIE, deleteRefreshCookie.toString())
+                    .build();
+
         } catch (AuthError e) {
             return ResponseEntity.status(401)
                     .header(HttpHeaders.WWW_AUTHENTICATE,
@@ -58,9 +87,14 @@ public class LocalAuthController {
         }
     }
 
-    private ResponseEntity<TokenResponseDTO> unauthorized(String code, String desc) {
+    /**
+     * 401 공통 응답 생성용 (바디는 null)
+     * 호출하는 쪽의 제네릭 타입에 맞게 알아서 맞춰줌
+     */
+    private <T> ResponseEntity<T> unauthorized(String code, String desc) {
         return ResponseEntity.status(401)
-                .header(HttpHeaders.WWW_AUTHENTICATE, "Bearer error=\"" + code + "\", error_description=\"" + desc + "\"")
+                .header(HttpHeaders.WWW_AUTHENTICATE,
+                        "Bearer error=\"" + code + "\", error_description=\"" + desc + "\"")
                 .body(null);
     }
 }

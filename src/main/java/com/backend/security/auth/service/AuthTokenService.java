@@ -1,5 +1,6 @@
 package com.backend.security.auth.service;
 
+import java.time.Duration;
 import java.time.Instant;
 
 import org.springframework.stereotype.Service;
@@ -7,7 +8,7 @@ import org.springframework.stereotype.Service;
 import com.backend.member.domain.Member;
 import com.backend.security.auth.domain.RefreshToken;
 import com.backend.security.util.HashUtil;
-import com.backend.security.auth.dto.TokenResponseDTO;
+import com.backend.security.auth.dto.TokenIssueResultDTO;
 import com.backend.security.auth.jwt.JwtTokenProvider;
 import com.backend.security.auth.repository.RefreshTokenRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +32,7 @@ public class AuthTokenService {
      * 클라이언트에게 내려줄 TokenResponseDTO로 변환해 돌려준다.
      */
     @Transactional
-    public TokenResponseDTO issueTokensFor(Member member) {
+    public TokenIssueResultDTO issueTokensFor(Member member) {
 
         final String userId = member.getUserId();
 
@@ -45,8 +46,14 @@ public class AuthTokenService {
         System.out.println("[LOGIN] userId=" + userId
                 + " refreshHash=" + refreshHash.substring(0, 12) + "...");
 
-        /// 3️⃣ 만료 시각 계산
-        Instant refreshExp = Instant.now().plus(tokenProvider.getRefreshValidity());
+        /// 3️⃣ 만료 시각 계산 
+        Duration accessValidity  = tokenProvider.getAccessValidity();
+        Duration refreshValidity = tokenProvider.getRefreshValidity();
+
+        long accessExpiresInSec  = accessValidity.toSeconds();
+        long refreshExpiresInSec = refreshValidity.toSeconds();
+
+        Instant refreshExp = Instant.now().plus(refreshValidity);
 
         // 4️⃣ DB에 저장 (있으면 rotate, 없으면 새로 생성)
         refreshRepo.findByUserId(userId)
@@ -62,13 +69,13 @@ public class AuthTokenService {
                 }
             );
 
-    // 5️⃣ 응답 DTO 리턴 (클라엔트엔 원문 refresh 전달)
-    return new TokenResponseDTO(
-        access,
-        refresh,
-        "Bearer",
-        tokenProvider.getAccessValidity().toSeconds(),
-        tokenProvider.getRefreshValidity().toSeconds()
-    );
+        // 5️⃣ 응답 DTO 리턴 (클라엔트엔 원문 refresh 전달)
+        return new TokenIssueResultDTO(
+            access,
+            refresh,
+            "Bearer",
+            accessExpiresInSec,
+            refreshExpiresInSec
+        );
     }
 }

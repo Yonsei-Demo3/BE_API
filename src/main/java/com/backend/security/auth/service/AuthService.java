@@ -6,7 +6,7 @@ import com.backend.security.auth.blacklist.TokenBlacklistService;
 import com.backend.security.auth.domain.RefreshToken;
 import com.backend.security.auth.dto.LoginRequestDTO;
 import com.backend.security.auth.dto.RefreshRequestDTO;
-import com.backend.security.auth.dto.TokenResponseDTO;
+import com.backend.security.auth.dto.TokenIssueResultDTO;
 import com.backend.security.auth.exception.AuthError;
 import com.backend.security.auth.jwt.JwtTokenProvider;
 import com.backend.security.auth.jwt.JwtValidationResult;
@@ -35,7 +35,7 @@ public class AuthService {
 
     /** 로그인: 이메일/비밀번호 검증 → 토큰세트 발급 */
     @Transactional
-    public TokenResponseDTO login(LoginRequestDTO req) {
+    public TokenIssueResultDTO login(LoginRequestDTO req) {
         Member m = memberRepo.findByEmail(req.email())
                 .orElseThrow(() -> new AuthError("invalid_grant", "이메일 또는 비밀번호가 올바르지 않습니다."));
 
@@ -47,7 +47,7 @@ public class AuthService {
 
     /** 재발급: refresh 검증 → DB 해시 매치 → 로테이션 발급 */
     @Transactional
-    public TokenResponseDTO refresh(RefreshRequestDTO req) {
+    public TokenIssueResultDTO refresh(RefreshRequestDTO req) {
         final String oldRefresh = req.refreshToken();
         final String oldRefreshHash = HashUtil.sha256Base64(oldRefresh);
 

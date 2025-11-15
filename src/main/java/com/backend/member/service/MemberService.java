@@ -25,6 +25,7 @@ public class MemberService {
      * 로컬 회원가입
      */
     @Transactional
+    @SuppressWarnings("null")
     public MemberResponseDTO signUp(LocalSignUpRequestDTO req) {
         if (repo.existsByEmail(req.email())) {
             throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
@@ -39,13 +40,15 @@ public class MemberService {
                 encodedPw,
                 req.nickname()
         );
-
+        
+        saved = repo.save(saved);
         return MemberResponseDTO.from(saved);
     }
 
     /**
      * 회원 단일 조회 (readOnly 트랜잭션)
      */
+    @Transactional(readOnly = true)
     public MemberResponseDTO getByUserId(String userId) {
         Member m = repo.findByUserId(userId)
             .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
@@ -55,6 +58,8 @@ public class MemberService {
     /**
      * 회원 목록 조회 (페이지)
      */
+    @Transactional(readOnly = true)
+    @SuppressWarnings("null")
     public Page<MemberResponseDTO> list(Pageable pageable) {
         return repo.findAll(pageable)
                    .map(MemberResponseDTO::from);
@@ -86,6 +91,7 @@ public class MemberService {
      * 회원 삭제
      */
     @Transactional
+    @SuppressWarnings("null")
     public void deleteByUserId(String userId) {
         Member m = repo.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
