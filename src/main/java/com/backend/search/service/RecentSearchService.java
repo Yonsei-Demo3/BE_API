@@ -3,10 +3,10 @@ package com.backend.search.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +37,7 @@ public class RecentSearchService {
         redisTemplate.opsForList().trim(key, 0, MAX_HISTORY - 1);
 
         // 4) 너무 오래된 유저 히스토리는 자ㅌ동 만료 (예: 7일)
-        redisTemplate.expire(key, Duration.ofDays(7));
+        redisTemplate.expire(key, Objects.requireNonNull(Duration.ofDays(7)));
     }
 
     /**
