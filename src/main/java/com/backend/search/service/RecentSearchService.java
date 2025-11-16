@@ -36,7 +36,7 @@ public class RecentSearchService {
         // 3) 길이 제한
         redisTemplate.opsForList().trim(key, 0, MAX_HISTORY - 1);
 
-        // 4) 너무 오래된 유저 히스토리는 자동 만료 (예: 30일)
+        // 4) 너무 오래된 유저 히스토리는 자ㅌ동 만료 (예: 7일)
         redisTemplate.expire(key, Duration.ofDays(7));
     }
 
@@ -72,12 +72,17 @@ public class RecentSearchService {
      * 전체 최근 검색어 삭제
      */
     public void clearAll(String userId) {
-        redisTemplate.delete(key(userId));
+        String key = key(userId);
+        if (key == null || key.isBlank()) return;
+        redisTemplate.delete(key);
     }
 
     // ----------------- 내부 유틸 -----------------
 
     private String key(String userId) {
+                if (userId == null || userId.isBlank()) {
+            return null;
+        }
         return KEY_PREFIX + userId;
     }
 
