@@ -16,6 +16,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+//TODO: 테이블명 messages로 변경
 @Entity
 @NoArgsConstructor
 @Getter

@@ -1,9 +1,13 @@
 package com.backend.content.domain;
 
+import com.backend.categoryContent.CategoryContent;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "contents")
@@ -28,7 +32,9 @@ public class Content {
 
     @Column(length = 1000)
     private String link;
-    //TODO: Base Entity 연결, 카테고리 기능 구현 후 연결
+
+
+    //TODO: Base Entity 연결
 
     @Builder
     private Content(String name, String creator, String description, String image_url, String link) {

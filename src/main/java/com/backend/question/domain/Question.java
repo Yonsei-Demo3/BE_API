@@ -24,8 +24,6 @@ public class Question {
     @Column(nullable = false, length = 1000)
     private String description;
 
-    //TODO: Who made this? 고려해야하나....(방장) 방장 정보를 어디에 담을까!!!! Room, RoomMember, Question
-
     @Column(name = "max_participants", nullable = false)
     private int maxParticipants;
 

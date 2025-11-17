@@ -4,20 +4,18 @@ server:
 spring:
   application:
     name: be-api
-  
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${DB_HOST:terraform-20251109100457409000000001.clsgkaq0246t.ap-northeast-2.rds.amazonaws.com}:${DB_PORT:3306}/${DB_NAME:demo}?characterEncoding=UTF-8&serverTimezone=Asia/Seoul
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-
   data:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
   thymeleaf:
     cache: false
-  
+  datasource:
+    url: jdbc:mysql://localhost:${DB_PORT}/${DB_NAME}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+
   jpa:
     open-in-view: false
     properties:
@@ -25,7 +23,12 @@ spring:
         format_sql: true
         jdbc.time_zone: Asia/Seoul
     hibernate:
+        # 6. (중요) 'create'나 'update'로 설정
+        #    'create': 매번 서버 켤 때마다 테이블 전부 드랍하고 새로 만듦 (데이터 삭제됨)
+        #    'update': 엔티티 변경점만 감지해서 DB에 반영 (데이터 유지됨)
       ddl-auto: update
+
+
 
 springdoc:
   swagger-ui:
@@ -53,3 +56,48 @@ logging:
     org.springframework.security: DEBUG
     org.hibernate.SQL: debug
     org.hibernate.orm.jdbc.bind: trace
+
+categories:
+  - name: "도서"
+    children:
+      - "소설"
+      - "인문/사회/역사"
+      - "경영/경제"
+      - "자기계발"
+      - "에세이/시"
+      - "여행"
+      - "종교"
+      - "외국어"
+      - "과학"
+      - "진로/교육/교재"
+      - "컴퓨터/IT"
+      - "건강/다이어트"
+      - "가정/생활"
+      - "어린이/청소년"
+      - "잡지"
+  - name: "웹툰/만화/웹소설"
+    children:
+      - "로맨스 웹소설"
+      - "로판 웹소설"
+      - "판타지 웹소설"
+      - "만화 연재"
+      - "웹툰"
+  - name: "영화/TV"
+    children:
+      - "한국 예능"
+      - "한국"
+      - "외국"
+      - "아시아"
+      - "액션"
+      - "코미디"
+      - "스포츠"
+      - "키즈&가족"
+      - "로맨스"
+      - "드라마 장르"
+      - "호러"
+      - "스릴러"
+      - "SF"
+      - "판타지"
+      - "애니메이션"
+      - "다큐멘터리"
+      - "뮤지컬"

@@ -1,5 +1,4 @@
-package com.backend.question;
-
+package com.backend.question.service;
 
 import com.backend.content.domain.Content;
 import com.backend.content.repository.ContentRepository;
@@ -7,16 +6,28 @@ import com.backend.member.domain.Member;
 import com.backend.member.repository.MemberRepository;
 import com.backend.question.domain.Question;
 import com.backend.question.dto.request.CreateFirstQuestionRequestDTO;
+import com.backend.question.dto.request.QuestionSearchRequestDTO;
 import com.backend.question.dto.response.CreateQuestionResponseDTO;
+import com.backend.question.dto.response.QuestionDTO;
+import com.backend.question.dto.response.QuestionDetailResponseDTO;
 import com.backend.question.dto.response.QuestionResponseDTO;
 import com.backend.question.repository.QuestionRepository;
 import com.backend.room.domain.Room;
 import com.backend.room.repository.RoomRepository;
 import com.backend.roomMember.domain.RoomMember;
 import com.backend.roomMember.repository.RoomMemberRepository;
+import com.backend.tag.Tag;
+import com.backend.tag.TagRepository;
+import com.backend.tag.TagService;
+import com.backend.tagQuestion.TagQuestion;
+import com.backend.tagQuestion.TagQuestionRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -28,15 +39,19 @@ public class QuestionService {
     private final RoomRepository roomRepository;
     private final MemberRepository memberRepository;
     private final RoomMemberRepository roomMemberRepository;
+    private final TagService tagService;
+    private final TagQuestionRepository tagQuestionRepository;
+    private final QuestionDtoAssembler questionDtoAssembler;
 
     @Transactional
     public CreateQuestionResponseDTO createFirstQuestion(String hostUserId, CreateFirstQuestionRequestDTO dto) {
         Member host = memberRepository.findByUserId(hostUserId)
                 .orElseThrow(() -> new RuntimeException("member not found"));
 
-
         Content content = contentRepository.findById(dto.contentId())
                 .orElseThrow(() -> new RuntimeException("Content not found"));
+
+        //TODO: 태그 추가
 
         //TODO: Room이 id만 가지지에는 쫌 그렇긴하네... 그래도 아마 추후 메시지 추가 예정
         Room newRoom = new Room();
@@ -46,7 +61,6 @@ public class QuestionService {
         RoomMember newMember = RoomMember.of(newRoom, host);
         roomMemberRepository.save(newMember);
 
-
         Question question = Question.createFirstQuestionOf(
                 dto.title(),
                 dto.description(),
@@ -55,15 +69,22 @@ public class QuestionService {
                 newRoom,
                 content
         );
-        questionRepository.save(question);
+        Question savedQuestion = questionRepository.save(question);
 
+        List<Tag> tagEntities = tagService.findOrCreateTags(dto.tags() != null ? dto.tags() : java.util.Collections.emptyList());
+
+        for (Tag tag : tagEntities) {
+            TagQuestion newTagQuestion = TagQuestion.of(tag, savedQuestion);
+            tagQuestionRepository.save(newTagQuestion);
+        }
+        //TODO: DTO에 태그 반영
         return CreateQuestionResponseDTO.from(question);
     }
 
-
+    //TODO: 참여하면 어디로?
     //질문 참여
     @Transactional
-    public QuestionResponseDTO participateQuestion(String hostUserId, Long questionId) {
+    public QuestionDTO participateQuestion(String hostUserId, Long questionId) {
         Member participants = memberRepository.findByUserId(hostUserId)
                 .orElseThrow(() -> new RuntimeException("member not found"));
 
@@ -79,10 +100,25 @@ public class QuestionService {
         RoomMember newMember = RoomMember.of(room, participants);
         roomMemberRepository.save(newMember);
 
-        return QuestionResponseDTO.from(question);
+        return QuestionDTO.from(question);
     }
 
+    //TODO: 질문 상세 조회
+    public QuestionDetailResponseDTO getQuestionDetailById(Long questionId) {
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new RuntimeException("question not found"));
 
+        List<Tag> tags = tagQuestionRepository.findAllByQuestion(question)
+                .stream()
+                .map(TagQuestion::getTag)
+                .toList();
 
+        return QuestionDetailResponseDTO.from(question, tags);
+    }
 
+    //TODO: 검색
+    public Page<QuestionResponseDTO> searchQuestions(QuestionSearchRequestDTO dto, Pageable pageable) {
+        Page<Question> questionPage = questionRepository.search(dto, pageable);
+        return questionDtoAssembler.toPageDto(questionPage);
+    }
 }
