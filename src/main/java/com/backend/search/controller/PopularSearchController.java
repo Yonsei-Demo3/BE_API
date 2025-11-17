@@ -7,7 +7,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.validation.annotation.Validated;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 
 import java.util.List;
 
@@ -15,6 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/search")
 @RequiredArgsConstructor
+@Validated
 public class PopularSearchController {
 
     private final PopularSearchService popularSearchService;
@@ -22,7 +29,10 @@ public class PopularSearchController {
     @Operation(summary = "인기 검색어 TOP N (단순 카운트)")
     @GetMapping("/popular")
     public ResponseEntity<List<PopularKeywordDTO>> getPopularKeywords(
-            @RequestParam(name = "size", defaultValue = "10") int size
+        @RequestParam(name = "size", defaultValue = "10")
+        @Min(1)
+        @Max(50)
+        int size
     ) {
         return ResponseEntity.ok(
                 popularSearchService.getTopKeywordsWithCount(size)
@@ -32,7 +42,10 @@ public class PopularSearchController {
     @Operation(summary = "인기 검색어 TOP N + 순위 변화")
     @GetMapping("/popular/trending")
     public ResponseEntity<List<KeywordTrendDTO>> getTrendingKeywords(
-            @RequestParam(name = "size", defaultValue = "10") int size
+        @RequestParam(name = "size", defaultValue = "10")
+        @Min(1)
+        @Max(50)
+        int size
     ) {
         return ResponseEntity.ok(
                 popularSearchService.getTrending(size)

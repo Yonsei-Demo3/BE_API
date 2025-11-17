@@ -6,10 +6,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.List;
+import java.util.Set;
+import java.util.Objects;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -23,6 +27,9 @@ public class PopularSearchService {
 
     // 스냅샷 ZSET prefix (예: popular:search:snapshot:2025111601)
     private static final String SNAPSHOT_KEY_PREFIX = "popular:search:snapshot:";
+
+    // "마지막 스냅샷 키"를 저장하는 메타 키
+    private static final String LATEST_SNAPSHOT_META_KEY = "popular:search:snapshot:latest";
 
     private static final DateTimeFormatter SNAPSHOT_FORMATTER =
             DateTimeFormatter.ofPattern("yyyyMMddHH");
@@ -162,17 +169,20 @@ public class PopularSearchService {
                     .add(snapshotKey, value, score);
         }
 
+        long ttlSeconds = 7L * 24L * 60L * 60L;
         // 스냅샷 TTL (예: 7일) — Duration 안 쓰고 TimeUnit으로 처리
-        redisTemplate.expire(snapshotKey, 7L * 24L * 60L * 60L, TimeUnit.SECONDS);
+        redisTemplate.expire(snapshotKey, ttlSeconds, TimeUnit.SECONDS);
+        // "가장 최근 스냅샷 키" 메타데이터 업데이트
+        redisTemplate.opsForValue().set(LATEST_SNAPSHOT_META_KEY, snapshotKey, ttlSeconds, TimeUnit.SECONDS);
     }
 
-    // 가장 최근 스냅샷 키 찾기 (키 개수가 많지 않다는 가정)
+    // 가장 최근 스냅샷 키 찾기 (메타 키에서 바로 조회)
     private String findLatestSnapshotKey() {
-        Set<String> keys = redisTemplate.keys(SNAPSHOT_KEY_PREFIX + "*");
-        if (keys == null || keys.isEmpty()) return null;
-
-        // yyyyMMddHH 형식이라 문자열 정렬의 max가 가장 최신
-        return Collections.max(keys);
+        String latestKey = redisTemplate.opsForValue().get(LATEST_SNAPSHOT_META_KEY);
+        if (latestKey == null || latestKey.isBlank()) {
+                return null;
+            }
+        return latestKey;
     }
 
     private String normalize(String keyword) {
