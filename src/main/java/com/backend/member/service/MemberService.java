@@ -39,7 +39,6 @@ public class MemberService {
                 encodedPw,
                 req.nickname()
         );
-
         return MemberResponseDTO.from(saved);
     }
 
@@ -55,6 +54,8 @@ public class MemberService {
     /**
      * 회원 목록 조회 (페이지)
      */
+    @Transactional(readOnly = true)
+    @SuppressWarnings("null")
     public Page<MemberResponseDTO> list(Pageable pageable) {
         return repo.findAll(pageable)
                    .map(MemberResponseDTO::from);
@@ -86,6 +87,7 @@ public class MemberService {
      * 회원 삭제
      */
     @Transactional
+    @SuppressWarnings("null")
     public void deleteByUserId(String userId) {
         Member m = repo.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));

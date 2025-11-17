@@ -12,4 +12,8 @@ public class AuthError extends RuntimeException {
         this.code = code;
         this.desc = desc;
     }
+
+    public static AuthError invalidRefreshToken() {
+        return new AuthError("INVALID_REFRESH_TOKEN", "Refresh token is missing or empty.");
+    }
 }

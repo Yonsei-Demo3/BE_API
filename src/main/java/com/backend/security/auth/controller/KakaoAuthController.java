@@ -2,7 +2,7 @@ package com.backend.security.auth.controller;
 
 import com.backend.member.domain.Member;
 import com.backend.member.service.KakaoAuthService;
-import com.backend.security.auth.dto.TokenResponseDTO;
+import com.backend.security.auth.dto.TokenIssueResultDTO;
 import com.backend.security.auth.service.AuthTokenService;
 import com.backend.security.oauth.kakao.KakaoOAuthClient;
 import com.backend.security.oauth.kakao.dto.KakaoAccessTokenLoginRequestDTO;
@@ -34,7 +34,7 @@ public class KakaoAuthController {
 
     @Operation(summary = "[서버 사이드] 인가코드로 카카오 로그인")
     @PostMapping("/login-by-code")
-    public ResponseEntity<TokenResponseDTO> loginByCode(@Valid @RequestBody KakaoLoginRequestDTO req) {
+    public ResponseEntity<TokenIssueResultDTO> loginByCode(@Valid @RequestBody KakaoLoginRequestDTO req) {
         KakaoTokenResponseDTO token = kakao.exchangeCodeForToken(req.code());
         KakaoUserResponseDTO user = kakao.fetchUser(token.accessToken());
 
@@ -51,7 +51,7 @@ public class KakaoAuthController {
 
     @Operation(summary = "[프론트/모바일] 카카오 access_token으로 로그인")
     @PostMapping("/login-by-token")
-    public ResponseEntity<TokenResponseDTO> loginByToken(@Valid @RequestBody KakaoAccessTokenLoginRequestDTO req) {
+    public ResponseEntity<TokenIssueResultDTO> loginByToken(@Valid @RequestBody KakaoAccessTokenLoginRequestDTO req) {
         KakaoUserResponseDTO user = kakao.fetchUser(req.kakaoAccessToken());
 
         String socialId = String.valueOf(user.id());

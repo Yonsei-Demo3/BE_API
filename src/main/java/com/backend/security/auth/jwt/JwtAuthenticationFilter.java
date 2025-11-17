@@ -94,8 +94,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return p.startsWith("/healthz")
             || p.startsWith("/swagger-ui")
             || p.startsWith("/v3/api-docs")
-            || p.startsWith("/api/auth/login")
-            || p.startsWith("/api/auth/refresh")
+            || p.startsWith("/api/v1/auth/login")
+            || p.startsWith("/api/v1/auth/refresh")
             || p.startsWith("/error");
     }
 }

@@ -24,7 +24,7 @@ import com.backend.security.auth.user.CustomUserPrincipal;
 
 @Tag(name = "Member", description = "회원 API")
 @RestController
-@RequestMapping("/api/members")
+@RequestMapping("/api/v1/members")
 public class MemberController {
 
     private final MemberService memberService;
