@@ -51,8 +51,6 @@ public class QuestionService {
         Content content = contentRepository.findById(dto.contentId())
                 .orElseThrow(() -> new RuntimeException("Content not found"));
 
-        //TODO: 태그 추가
-
         //TODO: Room이 id만 가지지에는 쫌 그렇긴하네... 그래도 아마 추후 메시지 추가 예정
         Room newRoom = new Room();
         roomRepository.save(newRoom);
@@ -81,23 +79,29 @@ public class QuestionService {
         return CreateQuestionResponseDTO.from(question);
     }
 
-    //TODO: 참여하면 어디로?
+
     //질문 참여
     @Transactional
     public QuestionDTO participateQuestion(String hostUserId, Long questionId) {
-        Member participants = memberRepository.findByUserId(hostUserId)
+        Member participant = memberRepository.findByUserId(hostUserId)
                 .orElseThrow(() -> new RuntimeException("member not found"));
 
-        Question question = questionRepository.findById(questionId)
+        Question question = questionRepository.findByIdWithLock(questionId)
                 .orElseThrow(() -> new RuntimeException("question not found"));
 
         Room room = question.getRoom();
 
-        if(roomMemberRepository.existsByRoomAndMember(room, participants)) {
+        if (question.getCurrentParticipants() >= question.getMaxParticipants()) {
+            throw new RuntimeException("참여 인원이 초과되었습니다.");
+        }
+
+        if(roomMemberRepository.existsByRoomAndMember(room, participant)) {
             throw new RuntimeException("이미 참가한 질문 채팅방입니다.");
         }
 
-        RoomMember newMember = RoomMember.of(room, participants);
+        question.increaseCurrentParticipants();//DirtyChecking으로 저장
+
+        RoomMember newMember = RoomMember.of(room, participant);
         roomMemberRepository.save(newMember);
 
         return QuestionDTO.from(question);

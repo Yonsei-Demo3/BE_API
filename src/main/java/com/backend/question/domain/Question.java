@@ -27,6 +27,9 @@ public class Question {
     @Column(name = "max_participants", nullable = false)
     private int maxParticipants;
 
+    @Column(name = "current_participants",nullable = false)
+    private int currentParticipants = 0;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private QuestionStatus status;
@@ -47,6 +50,9 @@ public class Question {
     @JoinColumn(name = "parent_question_id")
     private Question parentQuestion;
 
+    public void increaseCurrentParticipants() {
+        this.currentParticipants++;
+    }
 
     @Builder
     private Question(String title, String description, int maxParticipants, QuestionStatus status, Member host, Room room, Content content, Question parentQuestion) {

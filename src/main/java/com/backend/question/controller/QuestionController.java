@@ -33,6 +33,7 @@ public class QuestionController {
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
     }
 
+    //TODO: 인원 수 확인 로직 추가 동시성 어떡하노
     @PostMapping("/{questionId}")
     public ResponseEntity<QuestionDTO> participateQuestion(@AuthenticationPrincipal CustomUserPrincipal me, @PathVariable Long questionId) {
         QuestionDTO responseDTO = questionService.participateQuestion(me.getUserId(), questionId);
