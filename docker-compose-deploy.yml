@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  app:
+    image: ${APP_IMAGE}          # ex) ehho/sai-api:latest
+    container_name: be-api
+    ports:
+      - "${APP_PORT}:8080"
+
+    env_file:
+      - .env
+
+    environment:
+      SPRING_PROFILES_ACTIVE: "${SPRING_PROFILES_ACTIVE}"
+      DB_HOST: "${DB_HOST}"
+      DB_PORT: "${DB_PORT}"
+      DB_NAME: "${DB_NAME}"
+      DB_USERNAME: "${DB_USERNAME}"
+      DB_PASSWORD: "${DB_PASSWORD}"
+      REDIS_HOST: "${REDIS_HOST}"
+      REDIS_PORT: "${REDIS_PORT}"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/healthz || exit 1"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+    networks:
+      - app-net
+
+networks:
+  app-net:
+    driver: bridge
