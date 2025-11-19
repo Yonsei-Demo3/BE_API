@@ -4,6 +4,11 @@ import com.backend.content.domain.Content;
 import com.backend.content.repository.ContentRepository;
 import com.backend.member.domain.Member;
 import com.backend.member.repository.MemberRepository;
+import com.backend.notification.Notification;
+import com.backend.notification.NotificationMessage;
+import com.backend.notification.NotificationPublisher;
+import com.backend.notification.NotificationRepository;
+import com.backend.notification.NotificationType;
 import com.backend.question.domain.Question;
 import com.backend.question.dto.request.CreateFirstQuestionRequestDTO;
 import com.backend.question.dto.request.QuestionSearchRequestDTO;
@@ -27,6 +32,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -42,6 +48,8 @@ public class QuestionService {
     private final TagService tagService;
     private final TagQuestionRepository tagQuestionRepository;
     private final QuestionDtoAssembler questionDtoAssembler;
+    private final NotificationPublisher notificationPublisher;
+    private final NotificationRepository notificationRepository;
 
     @Transactional
     public CreateQuestionResponseDTO createFirstQuestion(String hostUserId, CreateFirstQuestionRequestDTO dto) {
@@ -103,6 +111,23 @@ public class QuestionService {
 
         RoomMember newMember = RoomMember.of(room, participant);
         roomMemberRepository.save(newMember);
+
+        if (question.getCurrentParticipants()==(question.getMaxParticipants())) {
+
+            List<RoomMember> roomMembers = roomMemberRepository.findAllByRoom(room);
+
+            List<Notification> notifications = new ArrayList<>();
+
+            for (RoomMember rm : roomMembers) {
+                Member receiver = rm.getMember();
+
+                notifications.add(Notification.of(receiver, NotificationType.QUESTION_FULL));
+
+                NotificationMessage message = NotificationMessage.of(receiver.getId(), NotificationType.QUESTION_FULL);
+                notificationPublisher.publish(message);
+            }
+            notificationRepository.saveAll(notifications);
+        }
 
         return QuestionDTO.from(question);
     }
