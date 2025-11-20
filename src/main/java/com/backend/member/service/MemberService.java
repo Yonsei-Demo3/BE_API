@@ -33,12 +33,14 @@ public class MemberService {
         String encodedPw = encoder.encode(req.password());
 
         // UUID userId는 @PrePersist에서 자동 생성됨
-        Member saved = Member.local(
+        Member newMember = Member.local(
                 null,               // userId (null → 자동 UUID)
                 req.email(),
                 encodedPw,
                 req.nickname()
         );
+
+        Member saved = repo.save(newMember);
         return MemberResponseDTO.from(saved);
     }
 

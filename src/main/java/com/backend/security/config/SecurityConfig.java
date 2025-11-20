@@ -43,14 +43,20 @@ public class SecurityConfig {
             .logout(Customizer.withDefaults());
 
         // JWT 필터 등록 (블랙리스트 주입, 필요 시 audience도 전달 가능)
-        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(
+                new JwtAuthenticationFilter(tokenProvider, blacklist),
+                UsernamePasswordAuthenticationFilter.class
+        );
         return http.build();
     }
 
+    /*
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
         return new JwtAuthenticationFilter(tokenProvider, blacklist);
     }
+
+     */
 
     @Bean
     public PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(); }
