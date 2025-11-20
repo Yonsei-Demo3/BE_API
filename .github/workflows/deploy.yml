@@ -3,9 +3,6 @@ name: Deploy to EC2
 on:
   push:
     branches: [dev]
-    paths:
-      - 'BE_API/**'
-      - '.github/workflows/**'
   workflow_dispatch:
 
 concurrency:
