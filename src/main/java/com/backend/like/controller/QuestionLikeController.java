@@ -47,11 +47,11 @@ public class QuestionLikeController {
     @Operation(summary = "질문 좋아요 상태 조회")
     @GetMapping("/{questionId}/like")
     public ResponseEntity<QuestionLikeResponseDTO> getStatus(@PathVariable Long questionId) {
-        String userId = getCurrentUserId();
-
+        String userId = getCurrentUserIdOrNull();  // ✨ 로그인 optional
+    
         long count = questionLikeService.getLikeCount(questionId);
-        boolean liked = questionLikeService.hasLiked(userId, questionId);
-
+        boolean liked = (userId != null) && questionLikeService.hasLiked(userId, questionId);
+    
         return ResponseEntity.ok(
                 new QuestionLikeResponseDTO(questionId, count, liked)
         );
@@ -71,5 +71,21 @@ public class QuestionLikeController {
         }
     
         throw new AuthError("unauthorized", "유효하지 않은 인증 정보입니다.");
+    }
+
+    private String getCurrentUserIdOrNull() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()
+                || auth.getPrincipal() == null
+                || "anonymousUser".equals(auth.getPrincipal())) {
+            return null;    // 🔹 비로그인 → null
+        }
+    
+        Object principal = auth.getPrincipal();
+        if (principal instanceof CustomUserPrincipal me) {
+            return String.valueOf(me.getUserId());
+        }
+    
+        return null; // 예상치 못한 타입이면 guest 취급
     }
 }

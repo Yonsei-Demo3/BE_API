@@ -39,7 +39,9 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/auth/**").permitAll()
                 .requestMatchers("/error").permitAll()
                 .requestMatchers("/page", "/callback", "/api/v1/auth/oauth/kakao/callback").permitAll()
-                .requestMatchers("/api/v1/questions/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/questions/*/like").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/questions/*/like").authenticated()
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/questions/*/like").authenticated()
                 .requestMatchers("/api/v1/contents/**").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")             // 관리자 전용
                 .anyRequest().authenticated()
