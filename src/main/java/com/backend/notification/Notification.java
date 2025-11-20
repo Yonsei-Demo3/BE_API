@@ -27,7 +27,7 @@ public class Notification {
     private Member receiver;
 
     @Column(nullable = false)
-    private boolean isRead;
+    private boolean isRead = false;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
