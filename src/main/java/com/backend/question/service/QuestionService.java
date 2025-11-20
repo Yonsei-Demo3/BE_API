@@ -89,6 +89,7 @@ public class QuestionService {
 
 
     //질문 참여
+    //TODO: 코드가 쫌 복잡해지는 거 같기도... 특히 for문을 분리하는 방법 고려해야 할 듯
     @Transactional
     public QuestionDTO participateQuestion(String hostUserId, Long questionId) {
         Member participant = memberRepository.findByUserId(hostUserId)
@@ -123,8 +124,15 @@ public class QuestionService {
 
                 notifications.add(Notification.of(receiver, NotificationType.QUESTION_FULL));
 
-                NotificationMessage message = NotificationMessage.of(receiver.getId(), NotificationType.QUESTION_FULL);
-                notificationPublisher.publish(message);
+                //TODO: 데이터 베이스 저장 후 알림 전송할 수 있도록 EventListener? 추가
+                try {
+                    NotificationMessage message = NotificationMessage.of(receiver.getId(), NotificationType.QUESTION_FULL);
+                    notificationPublisher.publish(message);
+                } catch (Exception e) {
+                    // 에러가 나도 throw 하지 않고 로그만 찍음 (트랜잭션 유지)
+                    System.err.println("redis 알림 발송 실패 (사용자는 정상 참여됨): " + e.getMessage());
+                    // 실제 운영에선 log.error("...", e); 사용
+                }
             }
             notificationRepository.saveAll(notifications);
         }
