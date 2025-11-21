@@ -43,7 +43,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/v1/questions/*/like").authenticated()
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/questions/*/like").authenticated()
                 .requestMatchers("/api/v1/questions/search").permitAll()
-                .requestMatchers("/api/v1/search").permitAll()
+                .requestMatchers("/api/v1/search/**").permitAll()
                 .requestMatchers("/api/v1/contents/**").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")             // 관리자 전용
                 .anyRequest().authenticated()
