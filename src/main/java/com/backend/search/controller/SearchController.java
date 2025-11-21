@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Tag(name = "Search - Unified", description = "통합 검색 API (질문 + 콘텐츠 + 태그)")
 @RestController
 @RequestMapping("/api/v1/search")
@@ -33,6 +35,7 @@ public class SearchController {
             @PageableDefault(size = 20) Pageable pageable
     ) {
         String keyword = request.keyword();
+        List<Long> categoryIds = request.categoryIds();
 
         // 1) 최근 검색어 + 인기 검색어 반영
         if (keyword != null && !keyword.isBlank()) {
@@ -43,7 +46,7 @@ public class SearchController {
         }
 
         // 2) 실제 검색
-        SearchResponseDTO result = searchService.unifiedSearch(keyword, pageable);
+        SearchResponseDTO result = searchService.unifiedSearch(keyword, categoryIds, pageable);
         return ResponseEntity.ok(result);
     }
 }

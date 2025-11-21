@@ -1,4 +1,4 @@
-package com.backend.question.dto;
+package com.backend.question.repository;
 
 import com.backend.question.domain.Question;
 import org.springframework.data.domain.Page;

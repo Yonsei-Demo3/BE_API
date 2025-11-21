@@ -1,5 +1,8 @@
 package com.backend.search.dto;
 
+import java.util.List;
+
 public record SearchRequestDTO(
-    String keyword
+    String keyword,
+    List<Long> categoryIds
 ) {}

@@ -22,7 +22,7 @@ public class SearchService {
     private final ContentRepository contentRepository;
     private final TagSearchRepository tagRepository;
 
-    public SearchResponseDTO unifiedSearch(String rawKeyword, Pageable pageable) {
+    public SearchResponseDTO unifiedSearch(String rawKeyword, List<Long> categoryIds, Pageable pageable) {
         if (rawKeyword == null || rawKeyword.isBlank()) {
             return new SearchResponseDTO(List.of(), List.of(), List.of());
         }
