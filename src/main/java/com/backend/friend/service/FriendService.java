@@ -8,7 +8,6 @@ import com.backend.friend.repository.FriendRepository;
 import com.backend.member.domain.Member;
 import com.backend.member.repository.MemberRepository;
 import com.backend.security.auth.exception.AuthError;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
