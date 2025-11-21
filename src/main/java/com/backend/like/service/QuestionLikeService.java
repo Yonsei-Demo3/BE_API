@@ -34,7 +34,7 @@ public class QuestionLikeService {
             likeRepository.save(new QuestionLike(question, member));
         }
 
-        return likeRepository.countByQuestion(question);
+        return likeRepository.countByQuestion_Id(questionId);
     }
 
     /**
@@ -50,7 +50,7 @@ public class QuestionLikeService {
 
         likeRepository.deleteByQuestionAndMember(question, member);
 
-        return likeRepository.countByQuestion(question);
+        return likeRepository.countByQuestion_Id(questionId);
     }
 
     /**
@@ -58,10 +58,7 @@ public class QuestionLikeService {
      */
     @Transactional(readOnly = true)
     public long getLikeCount(Long questionId) {
-        Question question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 질문입니다. id=" + questionId));
-
-        return likeRepository.countByQuestion(question);
+        return likeRepository.countByQuestion_Id(questionId);
     }
 
     /**
@@ -69,12 +66,6 @@ public class QuestionLikeService {
      */
     @Transactional(readOnly = true)
     public boolean hasLiked(String userId, Long questionId) {
-        Question question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 질문입니다. id=" + questionId));
-
-        Member member = memberRepository.findByUserId(userId)
-                .orElseThrow(() -> new AuthError("invalid_user", "존재하지 않는 회원입니다."));
-
-        return likeRepository.existsByQuestionAndMember(question, member);
+        return likeRepository.existsByQuestion_IdAndMember_UserId(questionId, userId);
     }
 }
