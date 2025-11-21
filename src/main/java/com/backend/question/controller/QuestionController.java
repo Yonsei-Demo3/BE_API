@@ -17,6 +17,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import com.backend.search.service.RecentSearchService;
+import com.backend.search.service.PopularSearchService;
 
 import java.util.List;
 
@@ -26,6 +28,8 @@ import java.util.List;
 public class QuestionController {
 
     private final QuestionService questionService;
+    private final RecentSearchService recentSearchService;
+    private final PopularSearchService popularSearchService;
 
     @PostMapping
     public ResponseEntity<CreateQuestionResponseDTO> createFirstQuestion(@AuthenticationPrincipal CustomUserPrincipal me, @RequestBody CreateFirstQuestionRequestDTO dto) {
@@ -48,10 +52,25 @@ public class QuestionController {
 
     @PostMapping("/search")
     public ResponseEntity<Page<QuestionResponseDTO>> searchQuestions(
+            @AuthenticationPrincipal CustomUserPrincipal me,
             @RequestBody QuestionSearchRequestDTO questionSearchRequestDTO,
             @PageableDefault(size = 20, sort = "id", direction = Sort.Direction.DESC)
             Pageable pageable
     ) {
+        String keyword = questionSearchRequestDTO.keyword();
+
+        if (me != null &&
+            keyword != null &&
+            !keyword.isBlank()) {
+
+            recentSearchService.addKeyword(
+                    String.valueOf(me.getUserId()),
+                    keyword
+            );
+
+            popularSearchService.increase(keyword);
+        }
+
         Page<QuestionResponseDTO> responses =  questionService.searchQuestions(questionSearchRequestDTO, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(responses);
 
