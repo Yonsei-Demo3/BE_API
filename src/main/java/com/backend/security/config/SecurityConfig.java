@@ -86,10 +86,5 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter(tokenProvider, blacklist);
-    }
-
-    @Bean
     public PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(); }
 }

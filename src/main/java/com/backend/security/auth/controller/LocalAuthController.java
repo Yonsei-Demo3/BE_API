@@ -26,7 +26,7 @@ public class LocalAuthController {
     private final AuthService authService;
     private static final String REFRESH_COOKIE_NAME = "refreshToken";
 
-    @Operation(summary = "로그인 → Access는 바디, Refresh는 HttpOnly 쿠키로 발급")
+    @Operation(summary = "로그인 → Access는 Authorization 헤더, Refresh는 HttpOnly 쿠키로 발급")
     @PostMapping("/login")
     public ResponseEntity<Void> login(@RequestBody LoginRequestDTO req) {
         try {
@@ -50,7 +50,6 @@ public class LocalAuthController {
                     .build();
 
         } catch (AuthError e) {
-            // 여기서 T = AccessTokenResponseDTO 로 추론됨
             return unauthorized(e.getCode(), e.getDesc());
         }
     }
