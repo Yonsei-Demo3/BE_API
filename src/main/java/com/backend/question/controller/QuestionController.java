@@ -63,14 +63,12 @@ public class QuestionController {
             keyword != null &&
             !keyword.isBlank()) {
 
-            String normalized = keyword.trim();
-
             recentSearchService.addKeyword(
                     String.valueOf(me.getUserId()),
-                    normalized
+                    keyword
             );
 
-            popularSearchService.increase(normalized);
+            popularSearchService.increase(keyword);
         }
 
         Page<QuestionResponseDTO> responses =  questionService.searchQuestions(questionSearchRequestDTO, pageable);
