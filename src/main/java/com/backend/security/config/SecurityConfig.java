@@ -60,6 +60,14 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/messages/*/scrap").authenticated()
                 .requestMatchers(HttpMethod.GET, "/api/v1/messages/scrap/me").authenticated()
                 .requestMatchers(HttpMethod.GET,    "/api/v1/messages/scrap/*").authenticated()
+                
+                // 친구
+                .requestMatchers(HttpMethod.POST,   "/api/v1/friends/*").authenticated()
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/friends/*").authenticated()
+                .requestMatchers(HttpMethod.GET,    "/api/v1/friends/*/following").authenticated()
+                .requestMatchers(HttpMethod.GET,    "/api/v1/friends/*/counts").permitAll()
+                .requestMatchers(HttpMethod.GET,    "/api/v1/friends/*/followings").permitAll()
+                .requestMatchers(HttpMethod.GET,    "/api/v1/friends/*/followers").permitAll()
 
                 // 관리자 전용
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
