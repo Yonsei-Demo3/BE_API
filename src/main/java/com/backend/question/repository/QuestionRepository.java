@@ -24,7 +24,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long>, Quest
     @QueryHints({@QueryHint(name = "jakarta.persistence.lock.timeout", value = "3000")})
     Optional<Question> findByIdWithLock(@Param("id")Long id);
 
-        // ✅ 제목 또는 설명에 keyword가 포함된 질문을 검색 (대소문자 무시)
+    // 제목 또는 설명에 keyword가 포함된 질문을 검색 (대소문자 무시)
     Page<Question> findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
         String titleKeyword,
         String descriptionKeyword,
