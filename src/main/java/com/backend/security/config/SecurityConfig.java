@@ -34,18 +34,37 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/healthz", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/v1/members").permitAll() // 회원가입 공개
-                .requestMatchers("/api/v1/auth/**").permitAll()
-                .requestMatchers("/error").permitAll()
-                .requestMatchers("/page", "/callback", "/api/v1/auth/oauth/kakao/callback").permitAll()
+                // 공개 API
+                .requestMatchers(
+                    "/healthz",
+                    "/swagger-ui/**",
+                    "/v3/api-docs/**",
+                    "/error",
+                    "/page",
+                    "/callback",
+                    "/api/v1/auth/**",
+                    "/api/v1/auth/oauth/kakao/callback",
+                    "/api/v1/questions/search",
+                    "/api/v1/contents/**",
+                    "/api/v1/search/**"
+                ).permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/members").permitAll()
+
+                // 질문 좋아요
                 .requestMatchers(HttpMethod.GET, "/api/v1/questions/*/like").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/questions/*/like").authenticated()
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/questions/*/like").authenticated()
-                .requestMatchers("/api/v1/questions/search").permitAll()
-                .requestMatchers("/api/v1/search/**").permitAll()
-                .requestMatchers("/api/v1/contents/**").permitAll()
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")             // 관리자 전용
+
+                // 메시지 스크랩
+                .requestMatchers(HttpMethod.POST, "/api/v1/messages/*/scrap").authenticated()
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/messages/*/scrap").authenticated()
+                .requestMatchers(HttpMethod.GET, "/api/v1/messages/scrap/me").authenticated()
+                .requestMatchers(HttpMethod.GET,    "/api/v1/messages/scrap/*").authenticated()
+
+                // 관리자 전용
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+
+                // 나머지
                 .anyRequest().authenticated()
             )
             .httpBasic(b -> b.disable())
