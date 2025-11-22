@@ -1,6 +1,5 @@
 package com.backend.friend.service;
 
-import com.backend.friend.domain.Friend;
 import com.backend.friend.dto.FollowCountDTO;
 import com.backend.friend.dto.FriendUserDTO;
 import com.backend.friend.dto.FollowResponseDTO;
@@ -28,26 +27,7 @@ public class FriendService {
     }
 
     /**
-     * 팔로우
-     */
-    public FollowResponseDTO follow(String meUserId, String targetUserId) {
-        if (meUserId.equals(targetUserId)) {
-            throw new AuthError("invalid_follow", "자기 자신은 팔로우할 수 없습니다.");
-        }
-
-        Member me = getMemberByUserId(meUserId);
-        Member target = getMemberByUserId(targetUserId);
-
-        boolean exists = friendRepository.existsByFromMemberAndToMember(me, target);
-        if (!exists) {
-            friendRepository.save(Friend.of(me, target));
-        }
-
-        return new FollowResponseDTO(targetUserId, true);
-    }
-
-    /**
-     * 언팔로우 (없어도 에러 안냄)
+     * 언팔로우 (친구 삭제)
      */
     public FollowResponseDTO unfollow(String meUserId, String targetUserId) {
         Member me = getMemberByUserId(meUserId);

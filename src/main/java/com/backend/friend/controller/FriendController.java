@@ -22,16 +22,6 @@ public class FriendController {
 
     private final FriendService friendService;
 
-    @Operation(summary = "팔로우")
-    @PostMapping("/{targetUserId}")
-    public ResponseEntity<FollowResponseDTO> follow(
-            @AuthenticationPrincipal CustomUserPrincipal me,
-            @PathVariable String targetUserId
-    ) {
-        FollowResponseDTO dto = friendService.follow(me.getUserId(), targetUserId);
-        return ResponseEntity.ok(dto);
-    }
-
     @Operation(summary = "언팔로우")
     @DeleteMapping("/{targetUserId}")
     public ResponseEntity<FollowResponseDTO> unfollow(

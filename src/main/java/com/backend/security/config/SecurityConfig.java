@@ -46,7 +46,8 @@ public class SecurityConfig {
                     "/api/v1/auth/oauth/kakao/callback",
                     "/api/v1/questions/search",
                     "/api/v1/contents/**",
-                    "/api/v1/search/**"
+                    "/api/v1/search/**",
+                    "/api/v1/friend-requests/**"
                 ).permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/members").permitAll()
 
@@ -62,7 +63,6 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET,    "/api/v1/messages/scrap/*").authenticated()
                 
                 // 친구
-                .requestMatchers(HttpMethod.POST,   "/api/v1/friends/*").authenticated()
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/friends/*").authenticated()
                 .requestMatchers(HttpMethod.GET,    "/api/v1/friends/*/following").authenticated()
                 .requestMatchers(HttpMethod.GET,    "/api/v1/friends/*/counts").permitAll()
