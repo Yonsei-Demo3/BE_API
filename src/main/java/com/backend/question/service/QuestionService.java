@@ -1,5 +1,6 @@
 package com.backend.question.service;
 
+import com.backend.category.domain.Category;
 import com.backend.content.domain.Content;
 import com.backend.content.repository.ContentRepository;
 import com.backend.member.domain.Member;
@@ -138,6 +139,41 @@ public class QuestionService {
         }
 
         return QuestionDTO.from(question);
+    }
+
+    public List<QuestionResponseDTO> getQuestions(String userId) {
+        Member member = memberRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("member not found"));
+
+        List<RoomMember> myRoomMembers = roomMemberRepository.findAllByMember(member);
+
+        // 3. RoomMember에서 Room 정보만 쏙 추출
+        List<Room> myRooms = myRoomMembers.stream()
+                .map(RoomMember::getRoom)
+                .toList();
+
+        if (myRooms.isEmpty()) {
+            return List.of();
+        }
+
+        List<Question> questions = questionRepository.findByRoomIn(myRooms);
+
+        return questions.stream()
+                .map(question -> {
+                    List<Tag> tags = tagQuestionRepository.findAllByQuestion(question)
+                            .stream()
+                            .map(TagQuestion::getTag)
+                            .toList();
+
+                    //TODO: DTO 수정
+                    Category subCategory = null;
+
+                    // (3) DTO 생성 (수정된 DTO 시그니처에 맞춤)
+                    return QuestionResponseDTO.from(question, subCategory, tags);
+                })
+                .toList();
+
+
     }
 
     //TODO: 질문 상세 조회
