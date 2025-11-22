@@ -6,9 +6,18 @@ import com.backend.message.domain.Message;
 public record MessageResponseDTO(
         Long messageId,
         String content,
-        Long senderId
+        Long senderId,
+        String senderNickname,
+        boolean isMine
 ) {
-    public static MessageResponseDTO from(Message message) {
-        return new MessageResponseDTO(message.getId(), message.getContent(), message.getMember().getId());
+    public static MessageResponseDTO from(Message message, Long currentUserId) {
+        boolean isMine = message.getMember().getId().equals(currentUserId);
+        return new MessageResponseDTO(
+                message.getId(),
+                message.getContent(),
+                message.getMember().getId(),
+                message.getMember().getNickname(),
+                isMine);
+
     }
 }
