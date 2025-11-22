@@ -9,6 +9,7 @@ import com.backend.scrap.dto.MessageScrapResponseDTO;
 import com.backend.scrap.dto.ScrapMessageDTO;
 import com.backend.scrap.repository.MessageScrapRepository;
 import com.backend.security.auth.exception.AuthError;
+import com.backend.room.repository.RoomParticipantRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,28 +25,66 @@ public class MessageScrapService {
     private final MessageScrapRepository messageScrapRepository;
     private final MemberRepository memberRepository;
     private final MessageRepository messageRepository;
+    private final RoomParticipantRepository roomMemberRepository;
 
-    /**
-     * 메시지 스크랩 추가 (이미 스크랩 상태면 그대로 유지 - idempotent)
-     */
-    public MessageScrapResponseDTO scrap(String userId, Long messageId) {
-        Member me = memberRepository.findByUserId(userId)
+    private Member getMember(String userId) {
+        return memberRepository.findByUserId(userId)
                 .orElseThrow(() -> new AuthError("not_found_member", "존재하지 않는 회원입니다."));
+        }
 
-        Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 메시지입니다."));
+    private Message getMessage(Long messageId) {
+    return messageRepository.findById(messageId)
+            .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 메시지입니다."));
+    }
 
-        return messageScrapRepository.findByMemberAndMessage(me, message)
-                .map(scrap -> new MessageScrapResponseDTO(
-                        message.getId(),
+    // 
+    // 내가 참여한 방에서 스크랩
+    // 
+    public MessageScrapResponseDTO scrapFromMyRoom(String userId, Long messageId) {
+
+        Member me = getMember(userId);
+        Message msg = getMessage(messageId);
+        var roomId = msg.getRoom().getId();
+
+        boolean isParticipant =
+                        roomMemberRepository.existsByRoomIdAndMemberId(roomId, me.getId());
+
+        if (!isParticipant) {
+            throw new AuthError("not_participant", "해당 채팅방에 참여하지 않았습니다.");
+        }
+
+        return saveScrap(me, msg, "MY_ROOM");
+    }
+
+    // 
+    // 참여하지 않은 방에서 스크랩
+    // 
+    public MessageScrapResponseDTO scrapFromExternal(String userId, Long messageId) {
+        Member me = getMember(userId);
+        Message msg = getMessage(messageId);
+
+        return saveScrap(me, msg, "EXTERNAL");
+    }
+
+    // 
+    // 공통 저장 로직
+    // 
+    private MessageScrapResponseDTO saveScrap(Member me, Message msg, String source) {
+
+        return messageScrapRepository.findByMemberAndMessage(me, msg)
+                .map(s -> new MessageScrapResponseDTO(
+                        msg.getId(),
                         true,
-                        scrap.getScrappedAt()
+                        source,
+                        s.getScrappedAt()
                 ))
                 .orElseGet(() -> {
-                    MessageScrap saved = messageScrapRepository.save(MessageScrap.of(me, message));
+                    MessageScrap saved = messageScrapRepository.save(MessageScrap.of(me, msg));
+
                     return new MessageScrapResponseDTO(
-                            message.getId(),
+                            msg.getId(),
                             true,
+                            source,
                             saved.getScrappedAt()
                     );
                 });
@@ -65,7 +104,7 @@ public class MessageScrapService {
                 .ifPresent(messageScrapRepository::delete);
 
         // scrappedAt 은 이제 의미 없으니 null
-        return new MessageScrapResponseDTO(message.getId(), false, null);
+        return new MessageScrapResponseDTO(message.getId(), false, null, null);
     }
 
     /**
