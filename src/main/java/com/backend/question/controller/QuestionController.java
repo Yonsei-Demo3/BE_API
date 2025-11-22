@@ -18,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/questions")
 @RequiredArgsConstructor
@@ -35,6 +37,13 @@ public class QuestionController {
     public ResponseEntity<QuestionDTO> participateQuestion(@AuthenticationPrincipal CustomUserPrincipal me, @PathVariable Long questionId) {
         QuestionDTO responseDTO = questionService.participateQuestion(me.getUserId(), questionId);
         return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<QuestionResponseDTO>> getMyQuestions(@AuthenticationPrincipal CustomUserPrincipal me) {
+        List<QuestionResponseDTO> responseDTOS = questionService.getQuestions(me.getUserId());
+        return ResponseEntity.status(HttpStatus.OK).body(responseDTOS);
+
     }
 
     @GetMapping("/{questionId}")

@@ -19,15 +19,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class RoomController {
     private final RoomService roomService;
 
+    /*
     //TODO: 시큐리티 로직 추가
     @GetMapping
     public ResponseEntity<Page<MessageResponseDTO>> findMessagesByRoomId(@PathVariable Long roomId, @PageableDefault(sort = "id", direction = Sort.Direction.DESC, size = 30)Pageable pageable) {
 
         Page<MessageResponseDTO> messagePage = roomService.listMessages(roomId, pageable);
         return ResponseEntity.ok(messagePage);
-
-
-
-
     }
+
+     */
 }
