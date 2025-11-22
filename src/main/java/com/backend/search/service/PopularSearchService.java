@@ -33,6 +33,13 @@ public class PopularSearchService {
 
     private static final DateTimeFormatter SNAPSHOT_FORMATTER =
             DateTimeFormatter.ofPattern("yyyyMMddHH");
+    
+    private String extractSnapshotTime(String snapshotKey) {
+        if (snapshotKey == null) return null;
+        String raw = snapshotKey.replace(SNAPSHOT_KEY_PREFIX, ""); // 2025012304
+        return LocalDateTime.parse(raw, SNAPSHOT_FORMATTER)
+                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+    }
 
     /**
      * 검색어 카운트 +1
@@ -79,6 +86,7 @@ public class PopularSearchService {
 
         // 2) 가장 최근 스냅샷 키 찾기
         String latestSnapshotKey = findLatestSnapshotKey();
+        String snapshotAt = extractSnapshotTime(latestSnapshotKey);
         if (latestSnapshotKey == null) {
             // 스냅샷이 아직 없다면 전부 NEW 처리
             List<KeywordTrendDTO> result = new ArrayList<>();
@@ -90,7 +98,8 @@ public class PopularSearchService {
                         dto.count(),
                         rank,
                         null,        // 이전 순위 없음
-                        "NEW"        // NEW로 표시
+                        "NEW",        // NEW로 표시
+                        snapshotAt
                 ));
             }
             return result;
@@ -135,7 +144,8 @@ public class PopularSearchService {
                     dto.count(),
                     nowRank,
                     prevRank,
-                    movement
+                    movement,
+                    snapshotAt
             ));
         }
 
@@ -146,7 +156,7 @@ public class PopularSearchService {
      * 현재 인기검색어 상위 N개를 스냅샷 ZSET에 복사
      *  - 스케줄러에서 주기적으로 호출
      */
-    public void snapshotTopKeywords(int size) {
+    public void snapshotTopKeywords(int size, LocalDateTime snapshotTime) {
         Set<ZSetOperations.TypedTuple<String>> tuples =
                 redisTemplate.opsForZSet()
                         .reverseRangeWithScores(CURRENT_ZSET_KEY, 0, size - 1);
@@ -154,7 +164,7 @@ public class PopularSearchService {
         if (tuples == null || tuples.isEmpty()) return;
 
         String snapshotKey = SNAPSHOT_KEY_PREFIX
-                + LocalDateTime.now().format(SNAPSHOT_FORMATTER);
+            + snapshotTime.format(SNAPSHOT_FORMATTER);
 
         // 기존 스냅샷 키가 있다면 삭제 후 다시 저장 (idempotent하게)
         redisTemplate.delete(snapshotKey);

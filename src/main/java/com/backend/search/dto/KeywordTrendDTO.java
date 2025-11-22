@@ -8,5 +8,6 @@ public record KeywordTrendDTO(
         long count,
         int rank,             // 현재 순위 (1-based)
         Integer previousRank, // 이전 순위 (없으면 null)
-        String movement       // "UP" / "DOWN" / "SAME" / "NEW"
+        String movement,      // "UP" / "DOWN" / "SAME" / "NEW"
+        String snapshotAt
 ) {}
