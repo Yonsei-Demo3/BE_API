@@ -71,7 +71,7 @@ public class MessageScrapController {
     public ResponseEntity<List<ScrapMessageDTO>> getUserScraps(
             @PathVariable String targetUserId
     ) {
-        List<ScrapMessageDTO> list = messageScrapService.getMyScraps(targetUserId);
+        List<ScrapMessageDTO> list = messageScrapService.getUserScraps(targetUserId);
         return ResponseEntity.ok(list);
     }
 }
