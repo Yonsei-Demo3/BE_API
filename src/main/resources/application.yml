@@ -62,7 +62,7 @@ aws:
   secret-key: ${AWS_SECRET_ACCESS_KEY}
   region: ${AWS_REGION}
   s3:
-    bucket: sai_project
+    bucket: sai-final-bucket-asdfasdf
 
 categories:
   - name: "도서"
