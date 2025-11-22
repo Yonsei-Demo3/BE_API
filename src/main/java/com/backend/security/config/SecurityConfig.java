@@ -69,6 +69,9 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET,    "/api/v1/friends/*/followings").permitAll()
                 .requestMatchers(HttpMethod.GET,    "/api/v1/friends/*/followers").permitAll()
 
+                // 파일 업로드(S3 Presigned URL)
+                .requestMatchers(HttpMethod.POST, "/api/v1/files/presigned").permitAll()
+
                 // 관리자 전용
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
