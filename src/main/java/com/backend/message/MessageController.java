@@ -3,7 +3,6 @@ package com.backend.message;
 import com.backend.message.dto.MessageResponseDTO;
 import com.backend.security.auth.user.CustomUserPrincipal;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;

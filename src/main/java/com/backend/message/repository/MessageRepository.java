@@ -9,5 +9,5 @@ import java.util.List;
 
 public interface MessageRepository extends JpaRepository<Message, Long> {
     Page<Message> findByRoomId(Long roomId, Pageable pageable);
-    List<Message> findByRoomId(Long roomId);;
+    List<Message> findByRoomId(Long roomId);
 }

@@ -14,11 +14,10 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true )
+@Transactional(readOnly = true)
 public class MessageService {
     private final MessageRepository messageRepository;
     private final MemberRepository memberRepository;
-    private final RoomMemberRepository roomMemberRepository;
 
     //TODO: 내가 이방 멤버 인가 확인
     public List<MessageResponseDTO> getMessagesByRoomId(String userId, Long roomId) {
