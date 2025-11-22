@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface QuestionRepository extends JpaRepository<Question, Long>, QuestionRepositoryCustom {
@@ -22,5 +23,6 @@ public interface QuestionRepository extends JpaRepository<Question, Long>, Quest
     @QueryHints({@QueryHint(name = "jakarta.persistence.lock.timeout", value = "3000")})
     Optional<Question> findByIdWithLock(@Param("id")Long id);
 
+    List<Question> findByRoomIn(List<Room> rooms);
 
 }

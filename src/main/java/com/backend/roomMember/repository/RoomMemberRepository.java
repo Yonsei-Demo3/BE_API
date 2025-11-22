@@ -15,4 +15,7 @@ public interface RoomMemberRepository extends JpaRepository<RoomMember,Long> {
 
     @Query("select rm from RoomMember rm join fetch rm.member where rm.room = :room") //N+1 문제 방지를 위해 fetch 조인 커스텀
     List<RoomMember> findAllByRoom(@Param("room") Room room);
+
+    @Query("select rm from RoomMember rm join fetch rm.room where rm.member = :member")
+    List<RoomMember> findAllByMember(@Param("member") Member member);
 }
