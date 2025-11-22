@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +35,9 @@ public class PopularSearchService {
 
     private static final DateTimeFormatter SNAPSHOT_FORMATTER =
             DateTimeFormatter.ofPattern("yyyyMMddHH");
-    
+
+    private static final ZoneId KST = ZoneId.of("Asia/Seoul");
+
     private String extractSnapshotTime(String snapshotKey) {
         if (snapshotKey == null) return null;
         String raw = snapshotKey.replace(SNAPSHOT_KEY_PREFIX, ""); // 2025012304
@@ -156,15 +160,16 @@ public class PopularSearchService {
      * 현재 인기검색어 상위 N개를 스냅샷 ZSET에 복사
      *  - 스케줄러에서 주기적으로 호출
      */
-    public void snapshotTopKeywords(int size, LocalDateTime snapshotTime) {
+    public void snapshotTopKeywords(int size) {
         Set<ZSetOperations.TypedTuple<String>> tuples =
                 redisTemplate.opsForZSet()
                         .reverseRangeWithScores(CURRENT_ZSET_KEY, 0, size - 1);
 
         if (tuples == null || tuples.isEmpty()) return;
 
+        ZonedDateTime nowKst = ZonedDateTime.now(KST);
         String snapshotKey = SNAPSHOT_KEY_PREFIX
-            + snapshotTime.format(SNAPSHOT_FORMATTER);
+            + nowKst.format(SNAPSHOT_FORMATTER);
 
         // 기존 스냅샷 키가 있다면 삭제 후 다시 저장 (idempotent하게)
         redisTemplate.delete(snapshotKey);
