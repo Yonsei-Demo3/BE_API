@@ -56,7 +56,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/questions/*/like").authenticated()
 
                 // 메시지 스크랩
-                .requestMatchers(HttpMethod.POST, "/api/v1/messages/*/scrap").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/v1/messages/*/scrap/**").authenticated()
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/messages/*/scrap").authenticated()
                 .requestMatchers(HttpMethod.GET, "/api/v1/messages/scrap/me").authenticated()
                 .requestMatchers(HttpMethod.GET,    "/api/v1/messages/scrap/*").authenticated()

@@ -22,7 +22,7 @@ public class MessageScrapController {
 
     private final MessageScrapService messageScrapService;
 
-    @Operation(summary = "메시지 스크랩")
+    @Operation(summary = "메시지 스크랩(내가 참여한 방 -> 마이페이지: 저장)")
     @PostMapping("/{messageId}/scrap")
     public ResponseEntity<MessageScrapResponseDTO> scrap(
             @AuthenticationPrincipal CustomUserPrincipal me,
@@ -33,11 +33,25 @@ public class MessageScrapController {
         }
 
         String userId = me.getUserId();
-        MessageScrapResponseDTO dto = messageScrapService.scrap(userId, messageId);
+        MessageScrapResponseDTO dto = messageScrapService.scrapFromMyRoom(userId, messageId);
         return ResponseEntity.ok(dto);
     }
 
-    @Operation(summary = "메시지 스크랩 취소")
+    // 내가 참여하지 않은 톡방에서 스크랩
+    @Operation(summary = "메시지 스크랩 (참여하지 않은 방 -> 마이페이지: 스크랩)")
+    @PostMapping("/{messageId}/scrap/external")
+    public ResponseEntity<MessageScrapResponseDTO> scrapFromExternal(
+            @AuthenticationPrincipal CustomUserPrincipal me,
+            @PathVariable Long messageId
+    ) {
+        if (me == null) throw new AuthError("unauthorized", "로그인이 필요합니다.");
+        String userId = me.getUserId();
+
+        MessageScrapResponseDTO dto = messageScrapService.scrapFromExternal(userId, messageId);
+        return ResponseEntity.ok(dto);
+    }
+
+    @Operation(summary = "메시지 스크랩 취소 (본인이 참여한 방, 미참여한 방 둘 다 작동)")
     @DeleteMapping("/{messageId}/scrap")
     public ResponseEntity<MessageScrapResponseDTO> unscrap(
             @AuthenticationPrincipal CustomUserPrincipal me,
@@ -74,4 +88,6 @@ public class MessageScrapController {
         List<ScrapMessageDTO> list = messageScrapService.getUserScraps(userId);
         return ResponseEntity.ok(list);
     }
+
+
 }
