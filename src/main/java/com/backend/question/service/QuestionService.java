@@ -141,6 +141,7 @@ public class QuestionService {
         return QuestionDTO.from(question);
     }
 
+    //TODO: questionDTOAssembler 사용
     public List<QuestionResponseDTO> getQuestions(String userId) {
         Member member = memberRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("member not found"));
