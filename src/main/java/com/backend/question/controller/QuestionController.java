@@ -18,8 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/v1/questions")
 @RequiredArgsConstructor
@@ -48,13 +46,12 @@ public class QuestionController {
 
     @PostMapping("/search")
     public ResponseEntity<Page<QuestionResponseDTO>> searchQuestions(
+            @AuthenticationPrincipal CustomUserPrincipal me,
             @RequestBody QuestionSearchRequestDTO questionSearchRequestDTO,
             @PageableDefault(size = 20, sort = "id", direction = Sort.Direction.DESC)
             Pageable pageable
     ) {
         Page<QuestionResponseDTO> responses =  questionService.searchQuestions(questionSearchRequestDTO, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(responses);
-
     }
-
 }

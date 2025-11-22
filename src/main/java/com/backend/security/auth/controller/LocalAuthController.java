@@ -2,7 +2,6 @@ package com.backend.security.auth.controller;
 
 import com.backend.security.auth.dto.LoginRequestDTO;
 import com.backend.security.auth.dto.TokenIssueResultDTO;
-import com.backend.security.auth.dto.AccessTokenResponseDTO;
 import com.backend.security.auth.exception.AuthError;
 import com.backend.security.auth.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,9 +26,9 @@ public class LocalAuthController {
     private final AuthService authService;
     private static final String REFRESH_COOKIE_NAME = "refreshToken";
 
-    @Operation(summary = "로그인 → Access는 바디, Refresh는 HttpOnly 쿠키로 발급")
+    @Operation(summary = "로그인 → Access는 Authorization 헤더, Refresh는 HttpOnly 쿠키로 발급")
     @PostMapping("/login")
-    public ResponseEntity<AccessTokenResponseDTO> login(@RequestBody LoginRequestDTO req) {
+    public ResponseEntity<Void> login(@RequestBody LoginRequestDTO req) {
         try {
             TokenIssueResultDTO issued = authService.login(req);
 
@@ -42,19 +41,15 @@ public class LocalAuthController {
                     .sameSite("Lax")
                     .build();
 
-            // Access 토큰은 응답 바디로
-            AccessTokenResponseDTO body = new AccessTokenResponseDTO(
-                    issued.accessToken(),
-                    "Bearer",
-                    issued.accessTokenExpiresIn()
-            );
+            // Authorization 헤더에 넣을 값
+            String bearerToken = "Bearer " + issued.accessToken();
 
             return ResponseEntity.ok()
                     .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
-                    .body(body);
+                    .header(HttpHeaders.AUTHORIZATION, bearerToken)
+                    .build();
 
         } catch (AuthError e) {
-            // 여기서 T = AccessTokenResponseDTO 로 추론됨
             return unauthorized(e.getCode(), e.getDesc());
         }
     }
@@ -90,7 +85,7 @@ public class LocalAuthController {
 
     @Operation(summary = "재발급 → 쿠키의 Refresh로 Access 재발급 + Refresh 로테이션")
     @PostMapping("/refresh")
-    public ResponseEntity<AccessTokenResponseDTO> refresh(
+    public ResponseEntity<Void> refresh(
             @CookieValue(name = REFRESH_COOKIE_NAME, required = false) String refreshTokenCookie
     ) {
         try {
@@ -111,16 +106,12 @@ public class LocalAuthController {
                     .sameSite("Lax")
                     .build();
 
-            // 4) 바디에는 Access 토큰만 내려줌
-            AccessTokenResponseDTO body = new AccessTokenResponseDTO(
-                    issued.accessToken(),
-                    issued.tokenType(),          // "Bearer"
-                    issued.accessTokenExpiresIn()
-            );
+            String bearerToken = issued.tokenType() + " " + issued.accessToken();
 
             return ResponseEntity.ok()
                     .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
-                    .body(body);
+                    .header(HttpHeaders.AUTHORIZATION, bearerToken)
+                    .build();
 
         } catch (AuthError e) {
             // refresh가 잘못됐으면 쿠키도 같이 죽이기(보안상 안전)
