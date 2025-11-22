@@ -20,7 +20,6 @@ public class FileController {
     ) {
 
         String uploadUrl = s3Service.generateUploadUrl(request.fileName(), request.contentType());
-        // 버킷명이 뭘까?
         String fileUrl = "https://sai-final-bucket-asdfasdf.s3.ap-northeast-2.amazonaws.com/" + request.fileName();
 
         return ResponseEntity.ok(

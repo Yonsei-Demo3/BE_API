@@ -46,8 +46,7 @@ public class SecurityConfig {
                     "/api/v1/auth/oauth/kakao/callback",
                     "/api/v1/questions/search",
                     "/api/v1/contents/**",
-                    "/api/v1/search/**",
-                    "/api/v1/friend-requests/**"
+                    "/api/v1/search/**"
                 ).permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/members").permitAll()
 
@@ -68,6 +67,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET,    "/api/v1/friends/*/counts").permitAll()
                 .requestMatchers(HttpMethod.GET,    "/api/v1/friends/*/followings").permitAll()
                 .requestMatchers(HttpMethod.GET,    "/api/v1/friends/*/followers").permitAll()
+                // 친구 요청
+                .requestMatchers("/api/v1/friend-requests/**").authenticated()
 
                 // 파일 업로드(S3 Presigned URL)
                 .requestMatchers(HttpMethod.POST, "/api/v1/files/presigned").permitAll()
