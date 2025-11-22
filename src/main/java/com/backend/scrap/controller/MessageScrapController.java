@@ -69,9 +69,9 @@ public class MessageScrapController {
     @Operation(summary = "특정 사용자의 스크랩 메시지 목록 조회")
     @GetMapping("/scrap/{userId}")
     public ResponseEntity<List<ScrapMessageDTO>> getUserScraps(
-            @PathVariable String targetUserId
+            @PathVariable String userId
     ) {
-        List<ScrapMessageDTO> list = messageScrapService.getUserScraps(targetUserId);
+        List<ScrapMessageDTO> list = messageScrapService.getUserScraps(userId);
         return ResponseEntity.ok(list);
     }
 }

@@ -7,7 +7,7 @@ import com.backend.search.dto.QuestionSearchItemDTO;
 import com.backend.search.dto.SearchResponseDTO;
 import com.backend.search.dto.TagSearchItemDTO;
 import com.backend.tag.Tag;
-import com.backend.tag.TagSearchRepository;
+import com.backend.tag.TagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,9 +20,9 @@ public class SearchService {
 
     private final QuestionRepository questionRepository;
     private final ContentRepository contentRepository;
-    private final TagSearchRepository tagRepository;
+    private final TagRepository tagRepository;
 
-    public SearchResponseDTO unifiedSearch(String rawKeyword, List<Long> categoryIds, Pageable pageable) {
+    public SearchResponseDTO unifiedSearch(String rawKeyword, Pageable pageable) {
         if (rawKeyword == null || rawKeyword.isBlank()) {
             return new SearchResponseDTO(List.of(), List.of(), List.of());
         }
