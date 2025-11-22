@@ -74,7 +74,8 @@ public class QuestionController {
                     String.valueOf(me.getUserId()),
                     keyword
             );
-
+        }
+        if (keyword != null && !keyword.isBlank()) {
             popularSearchService.increase(keyword);
         }
 
