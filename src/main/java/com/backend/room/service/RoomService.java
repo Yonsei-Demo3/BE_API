@@ -41,9 +41,11 @@ public class RoomService {
         return RoomDTO.from(room);
     }
 
+    /*
     public Page<MessageResponseDTO> listMessages(Long roomId, Pageable pageable) {
         //TODO: 자기가 소속된 채팅방인지 확인하는 로직추가
         Page<Message> messagePage = messageRepository.findByRoomId(roomId, pageable);
         return messagePage.map(MessageResponseDTO::from);
     }
+     */
 }
