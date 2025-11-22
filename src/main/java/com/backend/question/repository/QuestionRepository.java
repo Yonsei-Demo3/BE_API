@@ -9,8 +9,6 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.query.Param;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
 
@@ -23,11 +21,4 @@ public interface QuestionRepository extends JpaRepository<Question, Long>, Quest
     @Query("select q from Question q where q.id = :id")
     @QueryHints({@QueryHint(name = "jakarta.persistence.lock.timeout", value = "3000")})
     Optional<Question> findByIdWithLock(@Param("id")Long id);
-
-    // 제목 또는 설명에 keyword가 포함된 질문을 검색 (대소문자 무시)
-    Page<Question> findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
-        String titleKeyword,
-        String descriptionKeyword,
-        Pageable pageable
-    );
 }
