@@ -20,11 +20,11 @@ public class KakaoOAuthClient {
     }
 
     // 1) 인가코드 → 카카오 액세스 토큰
-    public KakaoTokenResponseDTO exchangeCodeForToken(String code) {
+    public KakaoTokenResponseDTO exchangeCodeForToken(String code, String redirectUri) {
         String body = "grant_type=authorization_code" +
                 "&client_id=" + enc(props.getClientId()) +
                 (isBlank(props.getClientSecret()) ? "" : "&client_secret=" + enc(props.getClientSecret())) +
-                "&redirect_uri=" + enc(props.getRedirectUri()) +
+                "&redirect_uri=" + enc(redirectUri) +
                 "&code=" + enc(code);
 
         return webClient.post()
