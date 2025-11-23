@@ -50,7 +50,8 @@ public class SecurityConfig {
                 ).permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/members").permitAll()
 
-                // 질문 좋아요
+                // 질문
+                .requestMatchers(HttpMethod.GET, "/api/v1/questions/*").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/questions/*/like").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/questions/*/like").authenticated()
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/questions/*/like").authenticated()
