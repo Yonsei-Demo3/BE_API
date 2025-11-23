@@ -35,7 +35,7 @@ public class KakaoAuthController {
     @Operation(summary = "[서버 사이드] 인가코드로 카카오 로그인")
     @PostMapping("/login-by-code")
     public ResponseEntity<TokenIssueResultDTO> loginByCode(@Valid @RequestBody KakaoLoginRequestDTO req) {
-        KakaoTokenResponseDTO token = kakao.exchangeCodeForToken(req.code());
+        KakaoTokenResponseDTO token = kakao.exchangeCodeForToken(req.code(), req.redirectUri());
         KakaoUserResponseDTO user = kakao.fetchUser(token.accessToken());
 
         String socialId = String.valueOf(user.id());
