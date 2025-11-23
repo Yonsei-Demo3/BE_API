@@ -51,7 +51,6 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/v1/members").permitAll()
 
                 // 질문
-                .requestMatchers(HttpMethod.POST, "/api/v1/questions/*").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/questions/*").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/questions/*/like").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/questions/*/like").authenticated()
