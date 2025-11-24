@@ -11,6 +11,7 @@ import com.backend.notification.NotificationPublisher;
 import com.backend.notification.NotificationRepository;
 import com.backend.notification.NotificationType;
 import com.backend.question.domain.Question;
+import com.backend.question.domain.QuestionStatus;
 import com.backend.question.dto.request.CreateFirstQuestionRequestDTO;
 import com.backend.question.dto.request.QuestionSearchRequestDTO;
 import com.backend.question.dto.response.CreateQuestionResponseDTO;
@@ -114,6 +115,7 @@ public class QuestionService {
         RoomMember newMember = RoomMember.of(room, participant);
         roomMemberRepository.save(newMember);
 
+        //TODO:로직 간소화....
         if (question.getCurrentParticipants()==(question.getMaxParticipants())) {
 
             List<RoomMember> roomMembers = roomMemberRepository.findAllByRoom(room);
@@ -129,6 +131,7 @@ public class QuestionService {
                 try {
                     NotificationMessage message = NotificationMessage.of(receiver.getId(), NotificationType.QUESTION_FULL);
                     notificationPublisher.publish(message);
+                    //시간을 저장....
                 } catch (Exception e) {
                     // 에러가 나도 throw 하지 않고 로그만 찍음 (트랜잭션 유지)
                     System.err.println("redis 알림 발송 실패 (사용자는 정상 참여됨): " + e.getMessage());
@@ -137,12 +140,11 @@ public class QuestionService {
             }
             notificationRepository.saveAll(notifications);
         }
-
         return QuestionDTO.from(question);
     }
 
     //TODO: questionDTOAssembler 사용
-    public List<QuestionResponseDTO> getQuestions(String userId) {
+    public List<QuestionResponseDTO> getQuestions(String userId, String sort) {
         Member member = memberRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("member not found"));
 
@@ -157,8 +159,24 @@ public class QuestionService {
             return List.of();
         }
 
-        List<Question> questions = questionRepository.findByRoomIn(myRooms);
+        QuestionStatus targetStatus = null;
 
+        if (sort != null) {
+            switch (sort) {
+                case "participate" -> targetStatus = QuestionStatus.RECRUITING;  // 모집 중
+                case "ready" -> targetStatus = QuestionStatus.READY_CHECK; // 준비 중
+                case "finish" -> targetStatus = QuestionStatus.FINISHED;    // 종료됨 (또는 ACTIVE 포함 가능)
+                // default -> null (전체 조회)
+            }
+        }
+
+        List<Question> questions;
+
+        if (targetStatus != null) {
+            questions = questionRepository.findByRoomInAndStatus(myRooms, targetStatus);
+        } else {
+            questions = questionRepository.findByRoomIn(myRooms);
+        }
         return questions.stream()
                 .map(question -> {
                     List<Tag> tags = tagQuestionRepository.findAllByQuestion(question)
@@ -173,8 +191,6 @@ public class QuestionService {
                     return QuestionResponseDTO.from(question, subCategory, tags);
                 })
                 .toList();
-
-
     }
 
     //TODO: 질문 상세 조회
@@ -188,6 +204,39 @@ public class QuestionService {
                 .toList();
 
         return QuestionDetailResponseDTO.from(question, tags);
+    }
+
+    @Transactional
+    public void deleteQuestionById(Long questionId, String userId) {
+        Member member = memberRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("member not found"));
+
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new RuntimeException("question not found"));
+
+        Room room = question.getRoom();
+
+
+
+    }
+
+    @Transactional
+    public QuestionDTO readyQuestionById(Long questionId, String userId) {
+
+        Member member = memberRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("member not found"));
+
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new RuntimeException("question not found"));
+
+        Room room = question.getRoom();
+
+        RoomMember roomMember = roomMemberRepository.findByRoomAndMember(room, member)
+                .orElseThrow(() -> new RuntimeException("참여하지 않은 방입니다."));
+
+        roomMember.doReady();
+
+        return QuestionDTO.from(question);
     }
 
     //TODO: 검색

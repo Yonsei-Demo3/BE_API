@@ -1,6 +1,7 @@
 package com.backend.question.repository;
 
 import com.backend.question.domain.Question;
+import com.backend.question.domain.QuestionStatus;
 import com.backend.room.domain.Room;
 import jakarta.persistence.LockModeType;
 import jakarta.persistence.QueryHint;
@@ -24,5 +25,6 @@ public interface QuestionRepository extends JpaRepository<Question, Long>, Quest
     Optional<Question> findByIdWithLock(@Param("id")Long id);
 
     List<Question> findByRoomIn(List<Room> rooms);
+    List<Question> findByRoomInAndStatus(List<Room> rooms, QuestionStatus status);
 
 }

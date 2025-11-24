@@ -3,6 +3,7 @@ package com.backend.question.domain;
 import com.backend.content.domain.Content;
 import com.backend.member.domain.Member;
 import com.backend.room.domain.Room;
+import global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "questions")
 @Getter
 @NoArgsConstructor
-public class Question {
+public class Question extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,7 +29,7 @@ public class Question {
     private int maxParticipants;
 
     @Column(name = "current_participants",nullable = false)
-    private int currentParticipants = 0;
+    private int currentParticipants = 1;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

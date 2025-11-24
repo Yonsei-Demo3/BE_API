@@ -36,6 +36,10 @@ public class RoomMember {
     @Enumerated(EnumType.STRING)
     private RoomMemberStatus roomMemberStatus;
 
+    public void doReady() {
+        this.roomMemberStatus = RoomMemberStatus.READY;
+    }
+
 
     //TODO: BaseEntity 구현 후 추가, User 역할 구분(방장 or 참가자)
 
