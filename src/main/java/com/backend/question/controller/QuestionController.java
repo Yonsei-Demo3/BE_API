@@ -96,4 +96,10 @@ public class QuestionController {
         Page<QuestionResponseDTO> responses =  questionService.searchQuestions(questionSearchRequestDTO, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(responses);
     }
+
+    @GetMapping("/time/{questionId}")
+    public ResponseEntity<QuestionDTO> getTimeById(@PathVariable Long questionId) {
+        QuestionDTO responseDTO = questionService.getTimeById(questionId);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
+    }
 }

@@ -247,6 +247,12 @@ public class QuestionService {
         return QuestionDTO.from(question);
     }
 
+    public QuestionDTO getTimeById(Long questionId) {
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new RuntimeException("question not found"));
+        return QuestionDTO.from(question);
+    }
+
     //TODO: 검색
     public Page<QuestionResponseDTO> searchQuestions(QuestionSearchRequestDTO dto, Pageable pageable) {
         Page<Question> questionPage = questionRepository.search(dto, pageable);
