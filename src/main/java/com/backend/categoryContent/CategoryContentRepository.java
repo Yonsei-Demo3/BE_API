@@ -9,4 +9,5 @@ import java.util.List;
 public interface CategoryContentRepository extends JpaRepository<CategoryContent, Long> {
     List<CategoryContent> findAllByContentIn(List<Content> contents);
 
+    List<CategoryContent> findByContentIdIn(List<Long> contentIds);
 }

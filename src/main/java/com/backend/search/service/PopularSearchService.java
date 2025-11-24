@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +35,15 @@ public class PopularSearchService {
 
     private static final DateTimeFormatter SNAPSHOT_FORMATTER =
             DateTimeFormatter.ofPattern("yyyyMMddHH");
+
+    private static final ZoneId KST = ZoneId.of("Asia/Seoul");
+
+    private String extractSnapshotTime(String snapshotKey) {
+        if (snapshotKey == null) return null;
+        String raw = snapshotKey.replace(SNAPSHOT_KEY_PREFIX, ""); // 2025012304
+        return LocalDateTime.parse(raw, SNAPSHOT_FORMATTER)
+                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+    }
 
     /**
      * 검색어 카운트 +1
@@ -79,6 +90,7 @@ public class PopularSearchService {
 
         // 2) 가장 최근 스냅샷 키 찾기
         String latestSnapshotKey = findLatestSnapshotKey();
+        String snapshotAt = extractSnapshotTime(latestSnapshotKey);
         if (latestSnapshotKey == null) {
             // 스냅샷이 아직 없다면 전부 NEW 처리
             List<KeywordTrendDTO> result = new ArrayList<>();
@@ -90,7 +102,8 @@ public class PopularSearchService {
                         dto.count(),
                         rank,
                         null,        // 이전 순위 없음
-                        "NEW"        // NEW로 표시
+                        "NEW",        // NEW로 표시
+                        snapshotAt
                 ));
             }
             return result;
@@ -135,7 +148,8 @@ public class PopularSearchService {
                     dto.count(),
                     nowRank,
                     prevRank,
-                    movement
+                    movement,
+                    snapshotAt
             ));
         }
 
@@ -153,8 +167,9 @@ public class PopularSearchService {
 
         if (tuples == null || tuples.isEmpty()) return;
 
+        ZonedDateTime nowKst = ZonedDateTime.now(KST);
         String snapshotKey = SNAPSHOT_KEY_PREFIX
-                + LocalDateTime.now().format(SNAPSHOT_FORMATTER);
+            + nowKst.format(SNAPSHOT_FORMATTER);
 
         // 기존 스냅샷 키가 있다면 삭제 후 다시 저장 (idempotent하게)
         redisTemplate.delete(snapshotKey);
