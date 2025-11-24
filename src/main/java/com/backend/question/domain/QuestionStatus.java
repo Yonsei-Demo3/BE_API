@@ -6,9 +6,11 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum QuestionStatus {
-    PREPARING("시작 전"),
-    OPEN("진행 중"),
-    CLOSED("종료 됨");
+    RECRUITING("모집 중"),
+    READY_CHECK("준비 확인 중"),
+    ACTIVE("대화 진행 중"),
+    FINISHED("대화 종료 됨"),
+    CANCELED("대화 취소 됨");
 
     private final String description;
 

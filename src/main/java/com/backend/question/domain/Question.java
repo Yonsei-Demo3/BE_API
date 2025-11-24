@@ -72,7 +72,7 @@ public class Question {
                 .title(title)
                 .description(description)
                 .maxParticipants(maxParticipants)
-                .status(QuestionStatus.PREPARING)
+                .status(QuestionStatus.RECRUITING)
                 .content(content)
                 .host(host)
                 .room(room)

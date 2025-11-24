@@ -33,16 +33,21 @@ public class RoomMember {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
+    @Enumerated(EnumType.STRING)
+    private RoomMemberStatus roomMemberStatus;
+
 
     //TODO: BaseEntity 구현 후 추가, User 역할 구분(방장 or 참가자)
 
     @Builder
-    private RoomMember(Room room, Member member) {
+    private RoomMember(Room room, Member member, RoomMemberStatus status) {
         this.room = room;
         this.member = member;
+        this.roomMemberStatus = status;
     }
 
+    //처음엔 무조건 join으로 시작할것임 TODO: 네이밍 고려
     public static RoomMember of(Room room, Member member) {
-        return new RoomMember(room, member);
+        return new RoomMember(room, member, RoomMemberStatus.JOINED);
     }
 }
