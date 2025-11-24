@@ -57,7 +57,7 @@ public class QuestionController {
     public ResponseEntity<Page<QuestionResponseDTO>> searchQuestions(
             @AuthenticationPrincipal CustomUserPrincipal me,
             @RequestBody QuestionSearchRequestDTO questionSearchRequestDTO,
-            @PageableDefault(size = 20, sort = "id", direction = Sort.Direction.DESC)
+            @PageableDefault(size = 100, sort = "id", direction = Sort.Direction.DESC)
             Pageable pageable
     ) {
         Page<QuestionResponseDTO> responses =  questionService.searchQuestions(questionSearchRequestDTO, pageable);
