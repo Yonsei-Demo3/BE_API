@@ -14,6 +14,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 
 @Tag(name = "SocialAuth", description = "카카오 소셜 로그인")
 @RestController
@@ -46,7 +48,29 @@ public class KakaoAuthController {
                 ? user.kakaoAccount().profile().profileImageUrl() : null;
 
         Member m = socialAuthService.upsertKakaoUser(socialId, email, nickname, profile);
-        return ResponseEntity.ok(authTokenService.issueTokensFor(m));
+
+        // 기존처럼 토큰 발급
+        TokenIssueResultDTO tokens = authTokenService.issueTokensFor(m);
+
+        // 1) Access Token → Authorization 헤더
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + tokens.accessToken());
+
+        // 2) Refresh Token → HttpOnly 쿠키
+        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", tokens.refreshToken())
+                .httpOnly(true)
+                .secure(false)          // https 환경이면 true 유지
+                .sameSite("None")
+                .path("/")
+                .maxAge(60 * 60 * 24 * 14)  // 14일
+                .build();
+
+        headers.add(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .body(tokens);
     }
 
     @Operation(summary = "[프론트/모바일] 카카오 access_token으로 로그인")
@@ -62,7 +86,28 @@ public class KakaoAuthController {
                 ? user.kakaoAccount().profile().profileImageUrl() : null;
 
         Member m = socialAuthService.upsertKakaoUser(socialId, email, nickname, profile);
-        return ResponseEntity.ok(authTokenService.issueTokensFor(m));
+
+        // 기존처럼 토큰 발급
+        TokenIssueResultDTO tokens = authTokenService.issueTokensFor(m);
+
+        // 1) Access Token → Authorization 헤더
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + tokens.accessToken());
+
+        // 2) Refresh Token → HttpOnly 쿠키
+        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", tokens.refreshToken())
+                .httpOnly(true)
+                .secure(false)          // https 환경이면 true 유지
+                .sameSite("None")
+                .path("/")
+                .maxAge(60 * 60 * 24 * 14)  // 14일
+                .build();
+
+        headers.add(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .body(tokens);
     }
-    
 }
