@@ -56,7 +56,7 @@ public class QuestionController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
     }
 
-    //TODO: 이게 REST 원칙에 맞는가... 하지만 눈물을 머금고...
+    //TODO: 이게 REST 원칙에 맞는가... 하지만 눈물을 머금고... 차라리 participate/{questionId}가 나을 수도
     @DeleteMapping("/cancel/{questionId}")
     public ResponseEntity<Void> cancelParticipateById(@AuthenticationPrincipal CustomUserPrincipal me ,@PathVariable Long questionId) {
         questionService.cancelParticipateById(questionId, me.getUserId());
@@ -97,7 +97,7 @@ public class QuestionController {
         return ResponseEntity.status(HttpStatus.OK).body(responses);
     }
 
-    @GetMapping("/time/{questionId}")
+    @GetMapping("/{questionId}/timestamps")
     public ResponseEntity<QuestionDTO> getTimeById(@PathVariable Long questionId) {
         QuestionDTO responseDTO = questionService.getTimeById(questionId);
         return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
