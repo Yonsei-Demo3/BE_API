@@ -234,7 +234,7 @@ public class QuestionService {
         Member member = memberRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("member not found"));
 
-        Question question = questionRepository.findById(questionId)
+        Question question = questionRepository.findByIdWithLock(questionId)
                 .orElseThrow(() -> new RuntimeException("question not found"));
 
         Room room = question.getRoom();
