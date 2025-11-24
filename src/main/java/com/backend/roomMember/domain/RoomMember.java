@@ -34,6 +34,7 @@ public class RoomMember {
     private Member member;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private RoomMemberStatus roomMemberStatus;
 
     public void doReady() {

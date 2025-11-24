@@ -56,9 +56,13 @@ public class Question extends BaseTimeEntity {
     }
 
     public void decreaseCurrentParticipants() {
+        if (this.currentParticipants <= 1) {
+            throw new IllegalStateException("Cannot decrease participants below minimum count");
+        }
         this.currentParticipants--;
     }
 
+    //TODO: 이전 상태 확인
     public void beActive() {
         this.status = QuestionStatus.ACTIVE;
     }

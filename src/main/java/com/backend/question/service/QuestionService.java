@@ -139,8 +139,9 @@ public class QuestionService {
                 }
             }
             notificationRepository.saveAll(notifications);
+            question.beActive(); //TODO: READY CHECK...
         }
-        question.beActive();
+
         return QuestionDTO.from(question);
     }
 
@@ -207,12 +208,13 @@ public class QuestionService {
         return QuestionDetailResponseDTO.from(question, tags);
     }
 
+    //TODO: 진행중이거나 끝났을 땐 못하게 막아야함
     @Transactional
     public void cancelParticipateById(Long questionId, String userId) {
         Member member = memberRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("member not found"));
 
-        Question question = questionRepository.findById(questionId)
+        Question question = questionRepository.findByIdWithLock(questionId)
                 .orElseThrow(() -> new RuntimeException("question not found"));
 
         Room room = question.getRoom();
