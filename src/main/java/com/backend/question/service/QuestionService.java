@@ -207,7 +207,7 @@ public class QuestionService {
     }
 
     @Transactional
-    public void deleteQuestionById(Long questionId, String userId) {
+    public void cancelParticipateById(Long questionId, String userId) {
         Member member = memberRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("member not found"));
 
@@ -216,8 +216,16 @@ public class QuestionService {
 
         Room room = question.getRoom();
 
+        RoomMember roomMember = roomMemberRepository.findByRoomAndMember(room, member)
+                .orElseThrow(() -> new RuntimeException("room member not found"));
 
+        if (question.getHost().getId().equals(member.getId())) {
+            throw new RuntimeException("방장은 참여를 취소할 수 없습니다. 방을 삭제해주세요.");
+        }
 
+        roomMemberRepository.delete(roomMember);
+
+        question.decreaseCurrentParticipants();
     }
 
     @Transactional

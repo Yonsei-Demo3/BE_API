@@ -58,8 +58,8 @@ public class QuestionController {
 
     //TODO: 이게 REST 원칙에 맞는가... 하지만 눈물을 머금고...
     @DeleteMapping("/cancel/{questionId}")
-    public ResponseEntity<Void> deleteQuestionById(@AuthenticationPrincipal CustomUserPrincipal me ,@PathVariable Long questionId) {
-        questionService.deleteQuestionById(questionId);
+    public ResponseEntity<Void> cancelParticipateById(@AuthenticationPrincipal CustomUserPrincipal me ,@PathVariable Long questionId) {
+        questionService.cancelParticipateById(questionId, me.getUserId());
         return ResponseEntity.status(HttpStatus.OK).build();
 
     }
