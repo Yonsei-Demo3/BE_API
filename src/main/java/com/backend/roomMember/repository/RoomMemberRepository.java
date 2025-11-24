@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface RoomMemberRepository extends JpaRepository<RoomMember,Long> {
     boolean existsByRoomAndMember(Room room, Member member);
@@ -19,4 +20,6 @@ public interface RoomMemberRepository extends JpaRepository<RoomMember,Long> {
 
     @Query("select rm from RoomMember rm join fetch rm.room where rm.member = :member")
     List<RoomMember> findAllByMember(@Param("member") Member member);
+
+    Optional<RoomMember> findByRoomAndMember(Room room, Member member);
 }

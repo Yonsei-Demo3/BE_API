@@ -3,7 +3,9 @@ package com.backend.question.dto.response;
 import com.backend.category.domain.Category;
 import com.backend.question.domain.Question;
 import com.backend.tag.Tag;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 //TODO: 참여인원수, 좋아요
@@ -16,7 +18,13 @@ public record QuestionResponseDTO(
         String contentName,
         String mainCategory,
         String subCategory,
-        List<String> tagNames)
+
+        Integer maxParticipants,
+        Integer currentParticipants,
+        List<String> tagNames,
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+        LocalDateTime createdAt
+        )
 {
     public static QuestionResponseDTO from(Question question, Category subCategory, List<Tag> tags) {
         List<String> tagNames = tags.stream()
@@ -42,7 +50,10 @@ public record QuestionResponseDTO(
                 question.getContent().getName(),
                 mainCategoryName,
                 subCategoryName,
-                tagNames
+                question.getMaxParticipants(),
+                question.getCurrentParticipants(),
+                tagNames,
+                question.getCreatedAt()
         );
     }
 }

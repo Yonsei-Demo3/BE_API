@@ -37,22 +37,36 @@ public class QuestionController {
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
     }
 
-    @PostMapping("/{questionId}")
+    @PostMapping("/participate/{questionId}")
     public ResponseEntity<QuestionDTO> participateQuestion(@AuthenticationPrincipal CustomUserPrincipal me, @PathVariable Long questionId) {
         QuestionDTO responseDTO = questionService.participateQuestion(me.getUserId(), questionId);
         return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
     }
 
     @GetMapping
-    public ResponseEntity<List<QuestionResponseDTO>> getMyQuestions(@AuthenticationPrincipal CustomUserPrincipal me) {
-        List<QuestionResponseDTO> responseDTOS = questionService.getQuestions(me.getUserId());
-        return ResponseEntity.status(HttpStatus.OK).body(responseDTOS);
+    public ResponseEntity<List<QuestionResponseDTO>> getMyQuestions(@AuthenticationPrincipal CustomUserPrincipal me, @RequestParam(value = "sort", required =false) String sort) {
 
+        List<QuestionResponseDTO> responseDTOS = questionService.getQuestions(me.getUserId(),sort);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDTOS);
     }
 
     @GetMapping("/{questionId}")
     public ResponseEntity<QuestionDetailResponseDTO> getQuestionDetailById(@PathVariable Long questionId) {
         QuestionDetailResponseDTO responseDTO = questionService.getQuestionDetailById(questionId);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
+    }
+
+    //TODO: 이게 REST 원칙에 맞는가... 하지만 눈물을 머금고...
+    @DeleteMapping("/cancel/{questionId}")
+    public ResponseEntity<Void> cancelParticipateById(@AuthenticationPrincipal CustomUserPrincipal me ,@PathVariable Long questionId) {
+        questionService.cancelParticipateById(questionId, me.getUserId());
+        return ResponseEntity.status(HttpStatus.OK).build();
+
+    }
+
+    @PostMapping("/ready/{questionId}")
+    public ResponseEntity<QuestionDTO> readyQuestion(@AuthenticationPrincipal CustomUserPrincipal me, @PathVariable Long questionId) {
+        QuestionDTO responseDTO = questionService.readyQuestionById(questionId, me.getUserId());
         return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
     }
 
@@ -81,5 +95,11 @@ public class QuestionController {
 
         Page<QuestionResponseDTO> responses =  questionService.searchQuestions(questionSearchRequestDTO, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(responses);
+    }
+
+    @GetMapping("/time/{questionId}")
+    public ResponseEntity<QuestionDTO> getTimeById(@PathVariable Long questionId) {
+        QuestionDTO responseDTO = questionService.getTimeById(questionId);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
     }
 }
