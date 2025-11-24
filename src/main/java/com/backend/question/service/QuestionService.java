@@ -140,6 +140,7 @@ public class QuestionService {
             }
             notificationRepository.saveAll(notifications);
         }
+        question.beActive();
         return QuestionDTO.from(question);
     }
 

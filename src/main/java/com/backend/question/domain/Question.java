@@ -59,6 +59,10 @@ public class Question extends BaseTimeEntity {
         this.currentParticipants--;
     }
 
+    public void beActive() {
+        this.status = QuestionStatus.ACTIVE;
+    }
+
     @Builder
     private Question(String title, String description, int maxParticipants, QuestionStatus status, Member host, Room room, Content content, Question parentQuestion) {
         this.title = title;
