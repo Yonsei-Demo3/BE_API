@@ -1,13 +1,9 @@
 package com.backend.content.domain;
 
-import com.backend.categoryContent.CategoryContent;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "contents")

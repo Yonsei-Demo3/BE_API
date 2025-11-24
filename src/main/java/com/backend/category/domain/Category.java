@@ -1,6 +1,5 @@
 package com.backend.category.domain;
 
-import com.backend.categoryContent.CategoryContent;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
