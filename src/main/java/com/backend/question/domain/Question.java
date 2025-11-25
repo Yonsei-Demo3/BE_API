@@ -28,7 +28,7 @@ public class Question extends BaseTimeEntity {
     @Column(name = "max_participants", nullable = false)
     private int maxParticipants;
 
-    @Column(name = "current_participants",nullable = false)
+    @Column(name = "current_participants", nullable = false)
     private int currentParticipants = 1;
 
     @Enumerated(EnumType.STRING)
@@ -84,7 +84,7 @@ public class Question extends BaseTimeEntity {
         this.parentQuestion = parentQuestion;
     }
 
-    public static Question createFirstQuestionOf(String title, String description,int maxParticipants,QuestionStartMode startMode, Member host, Room room, Content content) {
+    public static Question createFirstQuestionOf(String title, String description, int maxParticipants, QuestionStartMode startMode, Member host, Room room, Content content) {
 
         return Question.builder()
                 .title(title)

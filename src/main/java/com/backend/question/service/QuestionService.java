@@ -139,7 +139,7 @@ public class QuestionService {
                 }
             }
             notificationRepository.saveAll(notifications);
-            question.beActive(); //TODO: READY CHECK 로직 생각 30초 있다가 beActive로 번경?
+            question.beActive(); //TODO: READY CHECK 로직 생각 30초 있다가 beActive로 변경?
         }
 
         return QuestionDTO.from(question);
@@ -190,9 +190,6 @@ public class QuestionService {
         }
         return questionDtoAssembler.toListDto(questions);
     }
-
-
-
 
     //TODO: 질문 상세 조회
     public QuestionDetailResponseDTO getQuestionDetailById(Long questionId) {
