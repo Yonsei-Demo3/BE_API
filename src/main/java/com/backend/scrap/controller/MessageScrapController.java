@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import com.backend.scrap.dto.ScrappedMessageSummaryDTO;
 
 import java.util.List;
 
@@ -89,5 +90,13 @@ public class MessageScrapController {
         return ResponseEntity.ok(list);
     }
 
-
+    @Operation(summary = "스크랩 많이 된 메시지 TOP N")
+    @GetMapping("/highlights")
+    public ResponseEntity<List<ScrappedMessageSummaryDTO>> getHighlights(
+            @RequestParam(name = "size", defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(
+            messageScrapService.getTopScrappedMessages(size)
+        );
+    }
 }
