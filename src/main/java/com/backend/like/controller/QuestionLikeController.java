@@ -63,19 +63,8 @@ public class QuestionLikeController {
             @AuthenticationPrincipal CustomUserPrincipal me
     ) {
         String userId = me.getUserId();
-
-        // 내가 좋아요 누른 questionId 목록 조회
-        List<Long> likedQuestionIds = questionLikeService.getLikedQuestionIds(userId);
-
-        // 각각 DTO 변환
-        List<QuestionLikeResponseDTO> result = likedQuestionIds.stream()
-                .map(questionId -> new QuestionLikeResponseDTO(
-                        questionId,
-                        questionLikeService.getLikeCount(questionId),
-                        true // 내가 눌렀으니 true 고정
-                ))
-                .toList();
-
+        List<QuestionLikeResponseDTO> result =
+                questionLikeService.getMyLikedQuestions(userId);
         return ResponseEntity.ok(result);
     }
 

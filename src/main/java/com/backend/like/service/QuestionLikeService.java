@@ -10,6 +10,8 @@ import com.backend.security.auth.exception.AuthError;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.backend.like.dto.QuestionLikeResponseDTO;
+import com.backend.like.dto.QuestionLikeSummary;
 
 import java.util.List;
 
@@ -79,8 +81,20 @@ public class QuestionLikeService {
         return likeRepository.existsByQuestionAndMember(question, member);
     }
 
-    // 내가 좋아요 누른 questionId 목록 반환
-    public List<Long> getLikedQuestionIds(String userId) {
-            return likeRepository.findLikedQuestionIdsByUserId(userId);
+    /**
+     * 내가 좋아요 누른 질문 ID 목록 조회
+     */
+    @Transactional(readOnly = true)
+    public List<QuestionLikeResponseDTO> getMyLikedQuestions(String userId) {
+        List<QuestionLikeSummary> rows =
+                likeRepository.findLikedQuestionIdsWithCountsByUserId(userId);
+    
+        return rows.stream()
+                .map(row -> new QuestionLikeResponseDTO(
+                        row.getQuestionId(),
+                        row.getLikeCount(),
+                        true   // 내 목록이니까 무조건 liked = true
+                ))
+                .toList();
     }
 }
