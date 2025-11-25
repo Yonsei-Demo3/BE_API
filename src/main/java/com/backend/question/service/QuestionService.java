@@ -9,6 +9,7 @@ import com.backend.notification.NotificationMessage;
 import com.backend.notification.NotificationPublisher;
 import com.backend.notification.NotificationRepository;
 import com.backend.notification.NotificationType;
+import com.backend.question.domain.ParticipationStatus;
 import com.backend.question.domain.Question;
 import com.backend.question.domain.QuestionStatus;
 import com.backend.question.dto.request.CreateFirstQuestionRequestDTO;
@@ -35,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -157,8 +159,14 @@ public class QuestionService {
                 .orElseThrow(() -> new RuntimeException("member not found"));
 
         List<Question> questions = questionRepository.findByHost(member);
-        return questionDtoAssembler.toListDto(questions);
 
+        Map<Long, ParticipationStatus> myStatusMap = questions.stream()
+        .collect(Collectors.toMap(
+                Question::getId,
+                q -> ParticipationStatus.JOINED
+        ));
+
+        return questionDtoAssembler.toListDto(questions, myStatusMap);
     }
 
     //TODO: questionDTOAssembler 사용
@@ -195,7 +203,20 @@ public class QuestionService {
         } else {
             questions = questionRepository.findByRoomIn(myRooms);
         }
-        return questionDtoAssembler.toListDto(questions);
+
+        Map<Long, ParticipationStatus> myStatusMap = questions.stream()
+                .collect(Collectors.toMap(
+                        Question::getId,
+                        q -> {
+                            if (q.getStatus() == QuestionStatus.ACTIVE) {
+                                return ParticipationStatus.JOINED;
+                            } else {
+                                return ParticipationStatus.WAITING;
+                            }
+                        }
+                ));
+
+        return questionDtoAssembler.toListDto(questions, myStatusMap);
     }
 
     //TODO: 질문 상세 조회
@@ -270,6 +291,9 @@ public class QuestionService {
     //TODO: 검색
     public Page<QuestionResponseDTO> searchQuestions(QuestionSearchRequestDTO dto, Pageable pageable) {
         Page<Question> questionPage = questionRepository.search(dto, pageable);
-        return questionDtoAssembler.toPageDto(questionPage);
+        return questionDtoAssembler.toPageDto(
+            questionPage,
+            java.util.Collections.emptyMap()   // 모두 ParticipationStatus.NONE 처리
+    );
     }
 }
