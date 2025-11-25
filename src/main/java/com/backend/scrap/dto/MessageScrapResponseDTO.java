@@ -12,6 +12,5 @@ import java.time.LocalDateTime;
 public record MessageScrapResponseDTO(
         Long messageId,
         boolean scrapped,
-        String source,        // "MY_ROOM" | "EXTERNAL"
         LocalDateTime scrappedAt
 ) {}
