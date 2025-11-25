@@ -24,7 +24,6 @@ import com.backend.room.repository.RoomRepository;
 import com.backend.roomMember.domain.RoomMember;
 import com.backend.roomMember.repository.RoomMemberRepository;
 import com.backend.tag.Tag;
-import com.backend.tag.TagRepository;
 import com.backend.tag.TagService;
 import com.backend.tagQuestion.TagQuestion;
 import com.backend.tagQuestion.TagQuestionRepository;
@@ -73,6 +72,7 @@ public class QuestionService {
                 dto.title(),
                 dto.description(),
                 dto.maxParticipants(),
+                dto.startMode(),
                 host,
                 newRoom,
                 content
@@ -139,10 +139,19 @@ public class QuestionService {
                 }
             }
             notificationRepository.saveAll(notifications);
-            question.beActive(); //TODO: READY CHECK...
+            question.beActive(); //TODO: READY CHECK 로직 생각 30초 있다가 beActive로 변경?
         }
 
         return QuestionDTO.from(question);
+    }
+
+    public List<QuestionResponseDTO> getMyWrittenQuestions(String userId) {
+        Member member =  memberRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("member not found"));
+
+        List<Question> questions = questionRepository.findByHost(member);
+        return questionDtoAssembler.toListDto(questions);
+
     }
 
     //TODO: questionDTOAssembler 사용
@@ -179,20 +188,7 @@ public class QuestionService {
         } else {
             questions = questionRepository.findByRoomIn(myRooms);
         }
-        return questions.stream()
-                .map(question -> {
-                    List<Tag> tags = tagQuestionRepository.findAllByQuestion(question)
-                            .stream()
-                            .map(TagQuestion::getTag)
-                            .toList();
-
-                    //TODO: DTO 수정
-                    Category subCategory = null;
-
-                    // (3) DTO 생성 (수정된 DTO 시그니처에 맞춤)
-                    return QuestionResponseDTO.from(question, subCategory, tags);
-                })
-                .toList();
+        return questionDtoAssembler.toListDto(questions);
     }
 
     //TODO: 질문 상세 조회

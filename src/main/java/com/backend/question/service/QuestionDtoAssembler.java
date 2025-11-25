@@ -37,6 +37,25 @@ public class QuestionDtoAssembler {
         });
     }
 
+    public List<QuestionResponseDTO> toListDto(List<Question> questions) {
+        if (questions.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 1. 태그와 카테고리를 한방 쿼리(IN절)로 다 가져옴 (N+1 해결)
+        Map<Long, List<Tag>> questionTagMap = getQuestionTagMap(questions);
+        Map<Long, Category> contentCategoryMap = getContentCategoryMap(questions);
+
+        // 2. 메모리에서 매핑해서 DTO 변환
+        return questions.stream()
+                .map(question -> {
+                    List<Tag> tags = questionTagMap.getOrDefault(question.getId(), Collections.emptyList());
+                    Category category = contentCategoryMap.get(question.getContent().getId());
+                    return QuestionResponseDTO.from(question, category, tags);
+                })
+                .toList();
+    }
+
     private Map<Long, List<Tag>> getQuestionTagMap(List<Question> questions) {
         return tagQuestionRepository
                 .findAllByQuestionIn(questions)

@@ -1,5 +1,6 @@
 package com.backend.question.repository;
 
+import com.backend.member.domain.Member;
 import com.backend.question.domain.Question;
 import com.backend.question.domain.QuestionStatus;
 import com.backend.room.domain.Room;
@@ -26,5 +27,6 @@ public interface QuestionRepository extends JpaRepository<Question, Long>, Quest
 
     List<Question> findByRoomIn(List<Room> rooms);
     List<Question> findByRoomInAndStatus(List<Room> rooms, QuestionStatus status);
+    List<Question> findByHost(Member member);
 
 }

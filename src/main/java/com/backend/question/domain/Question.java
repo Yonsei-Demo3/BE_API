@@ -28,8 +28,12 @@ public class Question extends BaseTimeEntity {
     @Column(name = "max_participants", nullable = false)
     private int maxParticipants;
 
-    @Column(name = "current_participants",nullable = false)
+    @Column(name = "current_participants", nullable = false)
     private int currentParticipants = 1;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private QuestionStartMode startMode;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -68,10 +72,11 @@ public class Question extends BaseTimeEntity {
     }
 
     @Builder
-    private Question(String title, String description, int maxParticipants, QuestionStatus status, Member host, Room room, Content content, Question parentQuestion) {
+    private Question(String title, String description, int maxParticipants, QuestionStartMode startMode, QuestionStatus status, Member host, Room room, Content content, Question parentQuestion) {
         this.title = title;
         this.description = description;
         this.maxParticipants = maxParticipants;
+        this.startMode = startMode;
         this.status = status;
         this.host = host;
         this.room = room;
@@ -79,12 +84,13 @@ public class Question extends BaseTimeEntity {
         this.parentQuestion = parentQuestion;
     }
 
-    public static Question createFirstQuestionOf(String title, String description,int maxParticipants, Member host, Room room, Content content) {
+    public static Question createFirstQuestionOf(String title, String description, int maxParticipants, QuestionStartMode startMode, Member host, Room room, Content content) {
 
         return Question.builder()
                 .title(title)
                 .description(description)
                 .maxParticipants(maxParticipants)
+                .startMode(startMode)
                 .status(QuestionStatus.RECRUITING)
                 .content(content)
                 .host(host)

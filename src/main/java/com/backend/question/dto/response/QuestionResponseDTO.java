@@ -2,6 +2,7 @@ package com.backend.question.dto.response;
 
 import com.backend.category.domain.Category;
 import com.backend.question.domain.Question;
+import com.backend.question.domain.QuestionStatus;
 import com.backend.tag.Tag;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -14,6 +15,7 @@ public record QuestionResponseDTO(
         Long roomId,
         String questionTitle,
         String questionDescription,
+        QuestionStatus questionStatus,
         String hostNickname,
         String contentName,
         String mainCategory,
@@ -46,6 +48,7 @@ public record QuestionResponseDTO(
                 question.getRoom().getId(),
                 question.getTitle(),
                 question.getDescription(),
+                question.getStatus(),
                 question.getHost().getNickname(),
                 question.getContent().getName(),
                 mainCategoryName,
