@@ -11,7 +11,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestParam;
+import com.backend.scrap.dto.ScrappedMessageSummaryDTO;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Max;
 import java.util.List;
 
 @Tag(name = "Message Scrap", description = "채팅 메시지 스크랩 API")
@@ -89,5 +93,16 @@ public class MessageScrapController {
         return ResponseEntity.ok(list);
     }
 
-
+    @Operation(summary = "스크랩 많이 된 메시지 TOP N")
+    @GetMapping("/scrap/popular")
+    public ResponseEntity<List<ScrappedMessageSummaryDTO>> getHighlights(
+            @RequestParam(name = "size", defaultValue = "10")
+            @Min(1)
+            @Max(50)
+            int size
+    ) {
+        return ResponseEntity.ok(
+            messageScrapService.getTopScrappedMessages(size)
+        );
+    }
 }

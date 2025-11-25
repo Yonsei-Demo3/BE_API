@@ -58,6 +58,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/v1/questions/*/likes/me").permitAll()
 
                 // 메시지 스크랩
+                .requestMatchers(HttpMethod.GET, "/api/v1/messages/scrap/popular").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/messages/*/scrap/**").authenticated()
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/messages/*/scrap").authenticated()
                 .requestMatchers(HttpMethod.GET, "/api/v1/messages/scrap/me").authenticated()

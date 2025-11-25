@@ -14,6 +14,8 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.backend.scrap.dto.ScrappedMessageSummaryDTO;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 
@@ -160,5 +162,15 @@ public class MessageScrapService {
                 );
         })
         .toList();
+    }
+
+    /**
+    * 인기 스크랩 조회
+    */
+    @Transactional(readOnly = true)
+    public List<ScrappedMessageSummaryDTO> getTopScrappedMessages(int size) {
+        return messageScrapRepository.findTopScrappedMessages(
+                PageRequest.of(0, size)
+        );
     }
 }
