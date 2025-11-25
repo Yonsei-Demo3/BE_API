@@ -41,7 +41,7 @@ app:
     secret: "WlV5b1p3ZjlxQmJvRzZyOXpZK0FteS1wSFh3czZfV2h5Zk1wbUhYd2s5S0pU"
     issuer: my-backend-api
     audience: web
-    access-token-validity-ms: 900000
+    access-token-validity-ms: 10800000   # 3 days
     refresh-token-validity-ms: 1209600000
     clock-skew-sec: 60
   oauth:
