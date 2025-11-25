@@ -35,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -122,6 +123,12 @@ public class QuestionService {
 
             List<Notification> notifications = new ArrayList<>();
 
+            Map<String, Object> notifyData = new java.util.HashMap<>();
+            notifyData.put("roomId", room.getId());
+            notifyData.put("questionId", question.getId());
+
+            String alertMessage = "질문 방 인원이 마감되었습니다! 준비해주세요.";
+
             for (RoomMember rm : roomMembers) {
                 Member receiver = rm.getMember();
 
@@ -129,7 +136,8 @@ public class QuestionService {
 
                 //TODO: 데이터 베이스 저장 후 알림 전송할 수 있도록 EventListener? 추가
                 try {
-                    NotificationMessage message = NotificationMessage.of(receiver.getId(), NotificationType.QUESTION_FULL);
+
+                    NotificationMessage message = NotificationMessage.of(receiver.getId(), NotificationType.QUESTION_FULL, alertMessage, notifyData);
                     notificationPublisher.publish(message);
                     //시간을 저장....
                 } catch (Exception e) {
@@ -139,7 +147,7 @@ public class QuestionService {
                 }
             }
             notificationRepository.saveAll(notifications);
-            question.beActive(); //TODO: READY CHECK 로직 생각 30초 있다가 beActive로 변경?
+            question.recruitingToReadyCheck();
         }
 
         return QuestionDTO.from(question);
@@ -227,6 +235,7 @@ public class QuestionService {
         question.decreaseCurrentParticipants();
     }
 
+    //TODO: 질문 상태가 Ready Check인 친구만 가능하도록 수정
     @Transactional
     public QuestionDTO readyQuestionById(Long questionId, String userId) {
 
@@ -242,6 +251,13 @@ public class QuestionService {
                 .orElseThrow(() -> new RuntimeException("참여하지 않은 방입니다."));
 
         roomMember.doReady();
+
+        if (question.getHost().getId().equals(member.getId())) {
+            if (question.getStatus() != QuestionStatus.READY_CHECK) {
+                throw new RuntimeException("질문 상태가 READY_CHECK가 아닙니다. 상태 전환이 불가능합니다.");
+            }
+            question.readyCheckToActive();
+        }
 
         return QuestionDTO.from(question);
     }

@@ -66,8 +66,18 @@ public class Question extends BaseTimeEntity {
         this.currentParticipants--;
     }
 
-    //TODO: 이전 상태 확인
-    public void beActive() {
+
+    public void recruitingToReadyCheck() {
+        if (this.status != QuestionStatus.RECRUITING) {
+            throw new IllegalStateException("Question must be in RECRUITING status to transition to READY_CHECK");
+        }
+        this.status = QuestionStatus.READY_CHECK;
+    }
+
+    public void readyCheckToActive() {
+        if (this.status != QuestionStatus.READY_CHECK) {
+            throw new IllegalStateException("Question must be in READY_CHECK status to become ACTIVE");
+        }
         this.status = QuestionStatus.ACTIVE;
     }
 
