@@ -9,11 +9,11 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(
-        name = "member_friends",
+        name = "friends",
         uniqueConstraints = {
                 @UniqueConstraint(
-                        name = "uk_friend_from_to",
-                        columnNames = {"from_member_id", "to_member_id"}
+                        name = "uk_friend_pair",
+                        columnNames = {"member1_id", "member2_id"}
                 )
         }
 )
@@ -25,26 +25,36 @@ public class Friend {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 나(팔로우 하는 사람)
+    // 항상 ID가 더 작은 쪽을 member1 로 저장해서 중복 방지
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "from_member_id", nullable = false)
-    private Member fromMember;
+    @JoinColumn(name = "member1_id", nullable = false)
+    private Member member1;
 
-    // 상대(팔로우 당하는 사람)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "to_member_id", nullable = false)
-    private Member toMember;
+    @JoinColumn(name = "member2_id", nullable = false)
+    private Member member2;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    private Friend(Member fromMember, Member toMember) {
-        this.fromMember = fromMember;
-        this.toMember = toMember;
+    public Friend(Member a, Member b) {
+        if (a.getId() < b.getId()) {
+            this.member1 = a;
+            this.member2 = b;
+        } else {
+            this.member1 = b;
+            this.member2 = a;
+        }
         this.createdAt = LocalDateTime.now();
     }
 
-    public static Friend of(Member from, Member to) {
-        return new Friend(from, to);
+    public boolean involves(Member member) {
+        return member1.equals(member) || member2.equals(member);
+    }
+
+    public Member otherSide(Member me) {
+        if (member1.equals(me)) return member2;
+        if (member2.equals(me)) return member1;
+        return null;
     }
 }

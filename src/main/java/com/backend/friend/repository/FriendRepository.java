@@ -3,18 +3,31 @@ package com.backend.friend.repository;
 import com.backend.friend.domain.Friend;
 import com.backend.member.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface FriendRepository extends JpaRepository<Friend, Long> {
 
-    boolean existsByFromMemberAndToMember(Member from, Member to);
+    @Query("""
+        SELECT f FROM Friend f
+        WHERE (f.member1 = :member OR f.member2 = :member)
+        """)
+    List<Friend> findAllByMember(@Param("member") Member member);
 
-    void deleteByFromMemberAndToMember(Member from, Member to);
+    @Query("""
+        SELECT f FROM Friend f
+        WHERE (f.member1 = :a AND f.member2 = :b)
+           OR (f.member1 = :b AND f.member2 = :a)
+        """)
+    Optional<Friend> findBetween(@Param("a") Member a, @Param("b") Member b);
 
-    long countByFromMember(Member from);   // 내가 팔로우하는 수 (following)
-    long countByToMember(Member to);       // 나를 팔로우하는 수 (follower)
-
-    List<Friend> findByFromMember(Member from); // 내가 팔로우하는 사람들
-    List<Friend> findByToMember(Member to);     // 나를 팔로우하는 사람들
+    @Query("""
+        SELECT COUNT(f) > 0 FROM Friend f
+        WHERE (f.member1 = :a AND f.member2 = :b)
+           OR (f.member1 = :b AND f.member2 = :a)
+        """)
+    boolean existsBetween(@Param("a") Member a, @Param("b") Member b);
 }
