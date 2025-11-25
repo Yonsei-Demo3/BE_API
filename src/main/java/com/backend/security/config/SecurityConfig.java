@@ -104,7 +104,7 @@ public class SecurityConfig {
                 "https://talkwithsai.com"
         ));
 
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(List.of("GET", "POST", "PETCH", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
 
         // ⭐ 여기에서 Authorization 헤더를 브라우저에 노출
