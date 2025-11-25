@@ -1,6 +1,5 @@
 package com.backend.question.service;
 
-import com.backend.category.domain.Category;
 import com.backend.content.domain.Content;
 import com.backend.content.repository.ContentRepository;
 import com.backend.member.domain.Member;

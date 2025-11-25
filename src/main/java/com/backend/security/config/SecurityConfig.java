@@ -65,13 +65,11 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET,    "/api/v1/messages/scrap/*").authenticated()
                 
                 // 친구
-                .requestMatchers(HttpMethod.DELETE, "/api/v1/friends/*").authenticated()
-                .requestMatchers(HttpMethod.GET,    "/api/v1/friends/*/following").authenticated()
-                .requestMatchers(HttpMethod.GET,    "/api/v1/friends/*/counts").permitAll()
-                .requestMatchers(HttpMethod.GET,    "/api/v1/friends/*/followings").permitAll()
-                .requestMatchers(HttpMethod.GET,    "/api/v1/friends/*/followers").permitAll()
+                .requestMatchers("/api/v1/friends/**").authenticated()
                 // 친구 요청
                 .requestMatchers("/api/v1/friend-requests/**").authenticated()
+                // 차단
+                .requestMatchers("/api/v1/blocks/**").authenticated()
 
                 // 파일 업로드(S3 Presigned URL)
                 .requestMatchers(HttpMethod.POST, "/api/v1/files/presigned").permitAll()
