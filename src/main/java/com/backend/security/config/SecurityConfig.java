@@ -55,6 +55,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/v1/questions/*/like").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/questions/*/like").authenticated()
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/questions/*/like").authenticated()
+                .requestMatchers(HttpMethod.GET, "/api/v1/questions/*/likes/me").permitAll()
 
                 // 메시지 스크랩
                 .requestMatchers(HttpMethod.POST, "/api/v1/messages/*/scrap/**").authenticated()
@@ -104,7 +105,7 @@ public class SecurityConfig {
                 "https://talkwithsai.com"
         ));
 
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(List.of("GET", "POST", "FETCH", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
 
         // ⭐ 여기에서 Authorization 헤더를 브라우저에 노출

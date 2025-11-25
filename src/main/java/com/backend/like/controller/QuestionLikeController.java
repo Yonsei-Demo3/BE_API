@@ -12,6 +12,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Tag(name = "Question Like", description = "질문 좋아요 API")
 @RestController
 @RequestMapping("/api/v1/questions")
@@ -53,6 +55,28 @@ public class QuestionLikeController {
         return ResponseEntity.ok(
                 new QuestionLikeResponseDTO(questionId, count, liked)
         );
+    }
+
+    @Operation(summary = "내가 좋아요 누른 질문 목록 조회")
+    @GetMapping("/likes/me")
+    public ResponseEntity<List<QuestionLikeResponseDTO>> getMyLikedQuestions(
+            @AuthenticationPrincipal CustomUserPrincipal me
+    ) {
+        String userId = me.getUserId();
+
+        // 내가 좋아요 누른 questionId 목록 조회
+        List<Long> likedQuestionIds = questionLikeService.getLikedQuestionIds(userId);
+
+        // 각각 DTO 변환
+        List<QuestionLikeResponseDTO> result = likedQuestionIds.stream()
+                .map(questionId -> new QuestionLikeResponseDTO(
+                        questionId,
+                        questionLikeService.getLikeCount(questionId),
+                        true // 내가 눌렀으니 true 고정
+                ))
+                .toList();
+
+        return ResponseEntity.ok(result);
     }
 
     private String getCurrentUserIdOrNull() {
