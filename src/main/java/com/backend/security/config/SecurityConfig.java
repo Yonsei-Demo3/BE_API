@@ -99,7 +99,8 @@ public class SecurityConfig {
         // 프론트 도메인들 적기 (예시)
         config.setAllowedOrigins(List.of(
                 "http://localhost:5173",
-                "https://gifpt-front.vercel.app"
+                "https://gifpt-front.vercel.app",
+                "https://www.talkwithsai.com"
         ));
 
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
