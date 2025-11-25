@@ -77,7 +77,10 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
             return null;
         }
         return question.title.containsIgnoreCase(keyword)
-                .or(question.description.containsIgnoreCase(keyword));
+                .or(question.description.containsIgnoreCase(keyword))
+                .or(content.name.containsIgnoreCase(keyword))
+                .or(content.creator.containsIgnoreCase(keyword))
+                .or(content.description.containsIgnoreCase(keyword));
     }
 
     private BooleanExpression inTags(List<String> tagNames) {

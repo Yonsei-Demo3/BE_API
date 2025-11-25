@@ -20,6 +20,7 @@ public record QuestionResponseDTO(
         String contentName,
         String mainCategory,
         String subCategory,
+        String imageUrl,
 
         Integer maxParticipants,
         Integer currentParticipants,
@@ -53,6 +54,7 @@ public record QuestionResponseDTO(
                 question.getContent().getName(),
                 mainCategoryName,
                 subCategoryName,
+                question.getContent().getImageUrl(),
                 question.getMaxParticipants(),
                 question.getCurrentParticipants(),
                 tagNames,
