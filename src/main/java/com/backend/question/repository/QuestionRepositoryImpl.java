@@ -21,6 +21,7 @@ import static com.backend.content.domain.QContent.content;
 import static com.backend.question.domain.QQuestion.question;
 import static com.backend.tag.QTag.tag;
 import static com.backend.tagQuestion.QTagQuestion.tagQuestion;
+import static javax.management.Query.or;
 
 @RequiredArgsConstructor
 public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
@@ -77,7 +78,10 @@ public class QuestionRepositoryImpl implements QuestionRepositoryCustom {
             return null;
         }
         return question.title.containsIgnoreCase(keyword)
-                .or(question.description.containsIgnoreCase(keyword));
+                .or(question.description.containsIgnoreCase(keyword))
+                .or(content.name.containsIgnoreCase(keyword))
+                .or(content.creator.containsIgnoreCase(keyword))
+                .or(content.description.containsIgnoreCase(keyword));
     }
 
     private BooleanExpression inTags(List<String> tagNames) {
