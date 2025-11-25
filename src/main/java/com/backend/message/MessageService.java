@@ -5,7 +5,6 @@ import com.backend.member.repository.MemberRepository;
 import com.backend.message.domain.Message;
 import com.backend.message.dto.MessageResponseDTO;
 import com.backend.message.repository.MessageRepository;
-import com.backend.roomMember.repository.RoomMemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

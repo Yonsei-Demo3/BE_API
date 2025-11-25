@@ -1,7 +1,6 @@
 package com.backend.question.dto.response;
 
 import com.backend.question.domain.Question;
-import com.backend.room.domain.Room;
 
 public record CreateQuestionResponseDTO(
         Long questionId,
