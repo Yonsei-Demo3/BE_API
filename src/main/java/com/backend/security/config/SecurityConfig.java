@@ -100,7 +100,8 @@ public class SecurityConfig {
         config.setAllowedOrigins(List.of(
                 "http://localhost:5173",
                 "https://gifpt-front.vercel.app",
-                "https://www.talkwithsai.com"
+                "https://www.talkwithsai.com",
+                "https://talkwithsai.com"
         ));
 
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
