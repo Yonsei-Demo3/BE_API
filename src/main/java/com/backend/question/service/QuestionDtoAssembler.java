@@ -5,6 +5,7 @@ import com.backend.categoryContent.CategoryContent;
 import com.backend.categoryContent.CategoryContentRepository;
 import com.backend.content.domain.Content;
 import com.backend.question.domain.Question;
+import com.backend.question.domain.ParticipationStatus;
 import com.backend.question.dto.response.QuestionResponseDTO;
 import com.backend.tag.Tag;
 import com.backend.tagQuestion.TagQuestionRepository;
@@ -24,20 +25,23 @@ public class QuestionDtoAssembler {
     private final TagQuestionRepository tagQuestionRepository;
     private final CategoryContentRepository categoryContentRepository;
 
-    public Page<QuestionResponseDTO> toPageDto(Page<Question> questionPage) {
+    public Page<QuestionResponseDTO> toPageDto(Page<Question> questionPage, Map<Long, ParticipationStatus> myStatusMap
+    ) {
         List<Question> questions = questionPage.getContent();
 
         Map<Long, List<Tag>> questionTagMap = getQuestionTagMap(questions);
         Map<Long, Category> contentCategoryMap = getContentCategoryMap(questions);
-
+        
         return questionPage.map(question -> {
             List<Tag> tags = questionTagMap.getOrDefault(question.getId(), Collections.emptyList());
             Category category = contentCategoryMap.get(question.getContent().getId());
-            return QuestionResponseDTO.from(question, category, tags);
+            ParticipationStatus myStatus = myStatusMap.getOrDefault(question.getId(), ParticipationStatus.NONE);
+            
+            return QuestionResponseDTO.from(question, category, tags, myStatus);
         });
     }
 
-    public List<QuestionResponseDTO> toListDto(List<Question> questions) {
+    public List<QuestionResponseDTO> toListDto(List<Question> questions, Map<Long, ParticipationStatus> myStatusMap) {
         if (questions.isEmpty()) {
             return Collections.emptyList();
         }
@@ -51,7 +55,9 @@ public class QuestionDtoAssembler {
                 .map(question -> {
                     List<Tag> tags = questionTagMap.getOrDefault(question.getId(), Collections.emptyList());
                     Category category = contentCategoryMap.get(question.getContent().getId());
-                    return QuestionResponseDTO.from(question, category, tags);
+                    ParticipationStatus myStatus = myStatusMap.getOrDefault(question.getId(), ParticipationStatus.NONE);
+
+                    return QuestionResponseDTO.from(question, category, tags, myStatus);
                 })
                 .toList();
     }
