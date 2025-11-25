@@ -14,6 +14,7 @@ import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+//TODO: 알림에 따라 socket을 통해 전달하는 내용이 너무 달라짐... 하위 클래스로 구현 고려
 @Entity
 @Getter
 @NoArgsConstructor
