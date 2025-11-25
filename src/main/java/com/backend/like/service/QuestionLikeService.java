@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class QuestionLikeService {
@@ -75,5 +77,10 @@ public class QuestionLikeService {
         Member member = memberRepository.findByUserId(userId)
                 .orElseThrow(() -> new AuthError("invalid_user", "존재하지 않는 회원입니다."));
         return likeRepository.existsByQuestionAndMember(question, member);
+    }
+
+    // 내가 좋아요 누른 questionId 목록 반환
+    public List<Long> getLikedQuestionIds(String userId) {
+            return likeRepository.findLikedQuestionIdsByUserId(userId);
     }
 }
