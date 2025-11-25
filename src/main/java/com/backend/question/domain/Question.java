@@ -69,14 +69,14 @@ public class Question extends BaseTimeEntity {
 
     public void recruitingToReadyCheck() {
         if (this.status != QuestionStatus.RECRUITING) {
-            throw new IllegalStateException("Cannot recruiting to ready check");
+            throw new IllegalStateException("Question must be in RECRUITING status to transition to READY_CHECK");
         }
         this.status = QuestionStatus.READY_CHECK;
     }
 
     public void readyCheckToActive() {
         if (this.status != QuestionStatus.READY_CHECK) {
-            throw new IllegalStateException("Cannot active to ready check");
+            throw new IllegalStateException("Question must be in READY_CHECK status to become ACTIVE");
         }
         this.status = QuestionStatus.ACTIVE;
     }

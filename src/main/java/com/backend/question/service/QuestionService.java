@@ -253,6 +253,9 @@ public class QuestionService {
         roomMember.doReady();
 
         if (question.getHost().getId().equals(member.getId())) {
+            if (question.getStatus() != QuestionStatus.READY_CHECK) {
+                throw new RuntimeException("질문 상태가 READY_CHECK가 아닙니다. 상태 전환이 불가능합니다.");
+            }
             question.readyCheckToActive();
         }
 
