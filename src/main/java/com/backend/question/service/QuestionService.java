@@ -282,6 +282,24 @@ public class QuestionService {
         return QuestionDTO.from(question);
     }
 
+    @Transactional
+    public QuestionDTO finishQuestionById(Long questionId, String userId) {
+        Member member = memberRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("member not found"));
+
+        Question question = questionRepository.findByIdWithLock(questionId)
+                .orElseThrow(() -> new RuntimeException("question not found"));
+
+        //TODO: 방장 로직 검증 추가
+
+        if (question.getStatus() != QuestionStatus.ACTIVE) {
+            throw new RuntimeException("질문 상태가 ACTIVE가 아닙니다.");
+        }
+        question.activeToFinished();
+
+        return QuestionDTO.from(question);
+    }
+
     public QuestionDTO getTimeById(Long questionId) {
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new RuntimeException("question not found"));
