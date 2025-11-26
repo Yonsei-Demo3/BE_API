@@ -14,6 +14,7 @@ import java.util.List;
 public record QuestionResponseDTO(
         Long questionId,
         Long roomId,
+        Long hostId,
         String questionTitle,
         String questionDescription,
         QuestionStatus questionStatus,
@@ -50,6 +51,7 @@ public record QuestionResponseDTO(
         return new QuestionResponseDTO(
                 question.getId(),
                 question.getRoom().getId(),
+                question.getHost().getId(),
                 question.getTitle(),
                 question.getDescription(),
                 question.getStatus(),
