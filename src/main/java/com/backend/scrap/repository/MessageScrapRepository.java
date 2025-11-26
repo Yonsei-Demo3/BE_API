@@ -18,6 +18,7 @@ public interface MessageScrapRepository extends JpaRepository<MessageScrap, Long
     boolean existsByMemberAndMessage(Member member, Message message);
 
     Optional<MessageScrap> findByMemberAndMessage(Member member, Message message);
+    List<MessageScrap> findByMemberAndMessageIn(Member member, List<Message> messages);
 
     List<MessageScrap> findByMemberOrderByIdDesc(Member member);
 
