@@ -14,12 +14,12 @@ public record MessageResponseDTO(
         String senderNickname,
         boolean isMine,
         MessageType type,
+        boolean isScrapped,
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
         LocalDateTime createdAt
 
 ) {
-    public static MessageResponseDTO from(Message message, Long currentUserId) {
-        boolean isMine = message.getMember().getId().equals(currentUserId);
+    public static MessageResponseDTO from(Message message, boolean isMine, boolean isScrapped) {
         return new MessageResponseDTO(
                 message.getId(),
                 message.getContent(),
@@ -27,6 +27,7 @@ public record MessageResponseDTO(
                 message.getMember().getNickname(),
                 isMine,
                 message.getType(),
+                isScrapped,
                 message.getCreatedAt()
         );
 
