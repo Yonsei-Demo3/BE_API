@@ -2,6 +2,7 @@ package com.backend.scrap.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
@@ -17,5 +18,5 @@ public class ScrappedMessageSummaryDTO {
     private String contentTitle;
 
     private Long scrapCount;
-    private java.time.LocalDateTime latestScrappedAt;
+    private LocalDateTime latestScrappedAt;
 }

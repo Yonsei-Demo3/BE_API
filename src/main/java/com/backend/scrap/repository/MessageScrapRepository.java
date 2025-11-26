@@ -36,7 +36,7 @@ public interface MessageScrapRepository extends JpaRepository<MessageScrap, Long
     from MessageScrap s
         join s.message m
         join m.room r
-        join Question q on q.room = r
+        join Question q on q.room = r and q.status = 'ACTIVE'
         join q.content c
     group by m.id, m.content, q.id, q.title, c.id, c.name
     order by count(s) desc
