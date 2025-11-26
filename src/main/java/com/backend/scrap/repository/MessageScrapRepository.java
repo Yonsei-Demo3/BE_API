@@ -23,13 +23,23 @@ public interface MessageScrapRepository extends JpaRepository<MessageScrap, Long
     List<MessageScrap> findByMemberOrderByIdDesc(Member member);
 
     @Query("""
-        SELECT new com.backend.scrap.dto.ScrappedMessageSummaryDTO(
-            ms.message.id,
-            COUNT(ms.id)
-        )
-        FROM MessageScrap ms
-        GROUP BY ms.message.id
-        ORDER BY COUNT(ms.id) DESC
+    select new com.backend.scrap.dto.ScrappedMessageSummaryDTO(
+        m.id,
+        m.content,
+        q.id,
+        q.title,
+        c.id,
+        c.name,
+        count(s),
+        max(s.scrappedAt)
+    )
+    from MessageScrap s
+        join s.message m
+        join m.room r
+        join Question q on q.room = r and q.status = 'ACTIVE'
+        join q.content c
+    group by m.id, m.content, q.id, q.title, c.id, c.name
+    order by count(s) desc
     """)
     List<ScrappedMessageSummaryDTO> findTopScrappedMessages(Pageable pageable);
 
