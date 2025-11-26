@@ -304,11 +304,34 @@ public class QuestionService {
         return QuestionDTO.from(question);
     }
 
-    public Page<QuestionResponseDTO> searchQuestions(QuestionSearchRequestDTO dto, Pageable pageable) {
+    public Page<QuestionResponseDTO> searchQuestions(String userId, QuestionSearchRequestDTO dto, Pageable pageable) {
         Page<Question> questionPage = questionRepository.search(dto, pageable);
+        Map<Long, ParticipationStatus> myStatusMap = java.util.Collections.emptyMap();
+
+        if (userId != null) {
+            Member me = memberRepository.findByUserId(userId)
+                    .orElseThrow(() -> new RuntimeException("member not found"));
+    
+            // 내가 속한 방들
+            List<RoomMember> myRoomMembers = roomMemberRepository.findAllByMember(me);
+            java.util.Set<Long> myRoomIds = myRoomMembers.stream()
+                    .map(rm -> rm.getRoom().getId())
+                    .collect(java.util.stream.Collectors.toSet());
+    
+            // 이번 검색 결과 중, 내가 속한 방의 질문만 WAITING/JOINED로 표시
+            myStatusMap = questionPage.getContent().stream()
+                    .filter(q -> myRoomIds.contains(q.getRoom().getId()))
+                    .collect(Collectors.toMap(
+                            Question::getId,
+                            q -> (q.getStatus() == QuestionStatus.ACTIVE)
+                                    ? ParticipationStatus.JOINED
+                                    : ParticipationStatus.WAITING
+                    ));
+        }
+
         return questionDtoAssembler.toPageDto(
             questionPage,
-            java.util.Collections.emptyMap()   // 모두 ParticipationStatus.NONE 처리
+            myStatusMap
     );
     }
 }
