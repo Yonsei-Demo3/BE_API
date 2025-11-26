@@ -105,7 +105,7 @@ public class QuestionController {
             popularSearchService.increase(keyword);
         }
 
-        Page<QuestionResponseDTO> responses =  questionService.searchQuestions(questionSearchRequestDTO, pageable);
+        Page<QuestionResponseDTO> responses =  questionService.searchQuestions(me != null ? me.getUserId() : null, questionSearchRequestDTO, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(responses);
     }
 
