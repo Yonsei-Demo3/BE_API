@@ -1,5 +1,8 @@
 package com.backend.question.service;
 
+import com.backend.category.domain.Category;
+import com.backend.categoryContent.CategoryContent;
+import com.backend.categoryContent.CategoryContentRepository;
 import com.backend.content.domain.Content;
 import com.backend.content.repository.ContentRepository;
 import com.backend.member.domain.Member;
@@ -53,6 +56,7 @@ public class QuestionService {
     private final QuestionDtoAssembler questionDtoAssembler;
     private final NotificationPublisher notificationPublisher;
     private final NotificationRepository notificationRepository;
+    private final CategoryContentRepository categoryContentRepository;
 
     @Transactional
     public CreateQuestionResponseDTO createFirstQuestion(String hostUserId, CreateFirstQuestionRequestDTO dto) {
@@ -217,7 +221,7 @@ public class QuestionService {
 
         return questionDtoAssembler.toListDto(questions, myStatusMap);
     }
-
+    //TODO: N+1 문제 해결
     public QuestionDetailResponseDTO getQuestionDetailById(Long questionId) {
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new RuntimeException("question not found"));
@@ -227,7 +231,13 @@ public class QuestionService {
                 .map(TagQuestion::getTag)
                 .toList();
 
-        return QuestionDetailResponseDTO.from(question, tags);
+        CategoryContent categoryContent  = categoryContentRepository.findByContent(question.getContent())
+                .orElseThrow(() -> new RuntimeException("category 찾을 수 없음"));
+
+        Category subCategory = categoryContent.getCategory();
+        Category mainCategory = subCategory.getParent();
+
+        return QuestionDetailResponseDTO.from(question, tags, mainCategory, subCategory);
     }
 
     //TODO: 진행중이거나 끝났을 땐 못하게 막아야함
