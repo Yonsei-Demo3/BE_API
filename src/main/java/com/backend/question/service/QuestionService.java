@@ -169,7 +169,6 @@ public class QuestionService {
         return questionDtoAssembler.toListDto(questions, myStatusMap);
     }
 
-    //TODO: questionDTOAssembler 사용
     public List<QuestionResponseDTO> getQuestions(String userId, String sort) {
         Member member = memberRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("member not found"));
@@ -219,7 +218,6 @@ public class QuestionService {
         return questionDtoAssembler.toListDto(questions, myStatusMap);
     }
 
-    //TODO: 질문 상세 조회
     public QuestionDetailResponseDTO getQuestionDetailById(Long questionId) {
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new RuntimeException("question not found"));
@@ -255,7 +253,6 @@ public class QuestionService {
         question.decreaseCurrentParticipants();
     }
 
-    //TODO: 질문 상태가 Ready Check인 친구만 가능하도록 수정
     @Transactional
     public QuestionDTO readyQuestionById(Long questionId, String userId) {
 
@@ -277,7 +274,26 @@ public class QuestionService {
                 throw new RuntimeException("질문 상태가 READY_CHECK가 아닙니다. 상태 전환이 불가능합니다.");
             }
             question.readyCheckToActive();
+            //42분 뒤 종료되게 스케줄러 등록!
         }
+
+        return QuestionDTO.from(question);
+    }
+
+    @Transactional
+    public QuestionDTO finishQuestionById(Long questionId, String userId) {
+        Member member = memberRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("member not found"));
+
+        Question question = questionRepository.findByIdWithLock(questionId)
+                .orElseThrow(() -> new RuntimeException("question not found"));
+
+        //TODO: 방장 로직 검증 추가
+
+        if (question.getStatus() != QuestionStatus.ACTIVE) {
+            throw new RuntimeException("질문 상태가 ACTIVE가 아닙니다.");
+        }
+        question.activeToFinished();
 
         return QuestionDTO.from(question);
     }
@@ -288,7 +304,6 @@ public class QuestionService {
         return QuestionDTO.from(question);
     }
 
-    //TODO: 검색
     public Page<QuestionResponseDTO> searchQuestions(QuestionSearchRequestDTO dto, Pageable pageable) {
         Page<Question> questionPage = questionRepository.search(dto, pageable);
         return questionDtoAssembler.toPageDto(

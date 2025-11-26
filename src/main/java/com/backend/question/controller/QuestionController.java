@@ -67,12 +67,18 @@ public class QuestionController {
     public ResponseEntity<Void> cancelParticipateById(@AuthenticationPrincipal CustomUserPrincipal me ,@PathVariable Long questionId) {
         questionService.cancelParticipateById(questionId, me.getUserId());
         return ResponseEntity.status(HttpStatus.OK).build();
-
     }
 
     @PostMapping("/ready/{questionId}")
     public ResponseEntity<QuestionDTO> readyQuestion(@AuthenticationPrincipal CustomUserPrincipal me, @PathVariable Long questionId) {
         QuestionDTO responseDTO = questionService.readyQuestionById(questionId, me.getUserId());
+        return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
+    }
+
+    //테스트용으로 작성
+    @PostMapping("/finish/{questionId}")
+    public ResponseEntity<QuestionDTO> finishQuestion(@AuthenticationPrincipal CustomUserPrincipal me, @PathVariable Long questionId) {
+        QuestionDTO responseDTO = questionService.finishQuestionById(questionId, me.getUserId());
         return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
     }
 

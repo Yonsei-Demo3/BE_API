@@ -81,6 +81,13 @@ public class Question extends BaseTimeEntity {
         this.status = QuestionStatus.ACTIVE;
     }
 
+    public void activeToFinished() {
+        if (this.status != QuestionStatus.ACTIVE) {
+            throw new IllegalStateException("Question must be in ACTIVE status to become FINISHED");
+        }
+        this.status = QuestionStatus.FINISHED;
+    }
+
     @Builder
     private Question(String title, String description, int maxParticipants, QuestionStartMode startMode, QuestionStatus status, Member host, Room room, Content content, Question parentQuestion) {
         this.title = title;
