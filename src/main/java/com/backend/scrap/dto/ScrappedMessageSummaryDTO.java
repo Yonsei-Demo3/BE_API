@@ -1,22 +1,14 @@
 package com.backend.scrap.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import java.time.LocalDateTime;
 
-@Getter
-@AllArgsConstructor
-public class ScrappedMessageSummaryDTO {
-
-    private Long messageId;
-    private String messageContent;
-
-    private Long questionId;
-    private String questionTitle;
-
-    private Long contentId;
-    private String contentTitle;
-
-    private Long scrapCount;
-    private LocalDateTime latestScrappedAt;
-}
+public record ScrappedMessageSummaryDTO(
+    Long messageId,
+    String messageContent,
+    Long questionId,
+    String questionTitle,
+    Long contentId,
+    String contentTitle,
+    Long scrapCount,
+    LocalDateTime latestScrappedAt
+) {}
