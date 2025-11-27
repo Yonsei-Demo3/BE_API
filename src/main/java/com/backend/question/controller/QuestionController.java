@@ -57,8 +57,15 @@ public class QuestionController {
     }
 
     @GetMapping("/{questionId}")
-    public ResponseEntity<QuestionDetailResponseDTO> getQuestionDetailById(@PathVariable Long questionId) {
-        QuestionDetailResponseDTO responseDTO = questionService.getQuestionDetailById(questionId);
+    public ResponseEntity<QuestionDetailResponseDTO> getQuestionDetailById(
+            @AuthenticationPrincipal CustomUserPrincipal me,
+            @PathVariable Long questionId
+    ) {
+        String userId = (me != null) ? me.getUserId() : null;
+    
+        QuestionDetailResponseDTO responseDTO =
+                questionService.getQuestionDetailById(questionId, userId);
+    
         return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
     }
 

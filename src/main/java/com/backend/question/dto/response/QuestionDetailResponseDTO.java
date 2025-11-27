@@ -2,6 +2,7 @@ package com.backend.question.dto.response;
 
 import com.backend.category.domain.Category;
 import com.backend.question.domain.Question;
+import com.backend.question.domain.ParticipationStatus; 
 import com.backend.tag.Tag;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -24,9 +25,10 @@ public record QuestionDetailResponseDTO(
         Integer maxParticipants,
         Integer currentParticipants,
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        ParticipationStatus myParticipationStatus
 ) {
-    public static QuestionDetailResponseDTO from(Question question, List<Tag> tags, Category mainCategory, Category subCategory) {
+    public static QuestionDetailResponseDTO from(Question question, List<Tag> tags, Category mainCategory, Category subCategory, ParticipationStatus myParticipationStatus) {
         List<String> tagNames = tags.stream()
                 .map(Tag::getName)
                 .toList();
@@ -45,6 +47,7 @@ public record QuestionDetailResponseDTO(
                 subCategory.getName(),
                 question.getMaxParticipants(),
                 question.getCurrentParticipants(),
-                question.getCreatedAt());
+                question.getCreatedAt(),
+                myParticipationStatus);
     }
 }
