@@ -20,6 +20,7 @@ import com.backend.question.dto.request.QuestionSearchRequestDTO;
 import com.backend.question.dto.response.CreateQuestionResponseDTO;
 import com.backend.question.dto.response.QuestionDTO;
 import com.backend.question.dto.response.QuestionDetailResponseDTO;
+import com.backend.question.dto.response.QuestionMembersResponseDTO;
 import com.backend.question.dto.response.QuestionResponseDTO;
 import com.backend.question.repository.QuestionRepository;
 import com.backend.like.repository.QuestionLikeRepository;
@@ -384,6 +385,23 @@ public class QuestionService {
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new RuntimeException("question not found"));
         return QuestionDTO.from(question);
+    }
+
+    public QuestionMembersResponseDTO getQuestionMembers(Long questionId, String userId) {
+        Member member = memberRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("member not found"));
+
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new RuntimeException("question not found"));
+        Room room = question.getRoom();
+
+        List<RoomMember> roomMembers = roomMemberRepository.findAllByRoom(room);
+
+        List<Member> members = roomMembers.stream()
+                .map(RoomMember::getMember)
+                .toList();
+
+        return QuestionMembersResponseDTO.of(members, member.getId());
     }
 
     public Page<QuestionResponseDTO> searchQuestions(String userId, QuestionSearchRequestDTO dto, Pageable pageable) {
