@@ -81,7 +81,7 @@ public class QuestionService {
         RoomMember newMember = RoomMember.of(
                 newRoom,
                 host,
-                new HashSet<>(usedNicknames)
+                new HashSet<>()
         );
         roomMemberRepository.save(newMember);
 
@@ -136,8 +136,7 @@ public class QuestionService {
                 room,
                 participant,
                 new HashSet<>(usedNicknames)
-            );
-            
+        );
         roomMemberRepository.save(newMember);
 
         //TODO:로직 간소화....

@@ -17,6 +17,10 @@ import java.util.Set;
                 @UniqueConstraint(
                         name = "room_member_uk",
                         columnNames = {"room_id", "member_id"}
+                ),
+                @UniqueConstraint(
+                    name = "uk_room_nickname",
+                    columnNames = {"room_id", "room_nickname"}
                 )
         }
 )

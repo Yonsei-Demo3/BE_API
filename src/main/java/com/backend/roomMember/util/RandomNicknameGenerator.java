@@ -1,10 +1,10 @@
 package com.backend.roomMember.util;
 
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.Set;
 
-public class RandomNicknameGenerator {
+public final class RandomNicknameGenerator {
 
     private static final List<String> ADJS = List.of(
         "따뜻한", "기분좋은", "상냥한", "다정한", "사랑스러운", "활기찬", "씩씩한", "용감한",
@@ -35,14 +35,16 @@ public class RandomNicknameGenerator {
         "메인쿤", "스코티시폴드", "하늘다람쥐", "흰돌고래", "바다표범"
     );
 
-    private static final Random random = new Random();
-    
     public static String generate(Set<String> existingNicknames) {
         String nickname;
 
         do {
-            String adj = ADJS.get(random.nextInt(ADJS.size()));
-            String animal = ANIMALS.get(random.nextInt(ANIMALS.size()));
+            int adjIndex = ThreadLocalRandom.current().nextInt(ADJS.size());
+            int animalIndex = ThreadLocalRandom.current().nextInt(ANIMALS.size());
+
+            String adj = ADJS.get(adjIndex);
+            String animal = ANIMALS.get(animalIndex);
+
             nickname = adj + " " + animal;
         } while (existingNicknames.contains(nickname));
 
