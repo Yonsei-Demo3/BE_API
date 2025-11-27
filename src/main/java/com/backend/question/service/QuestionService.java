@@ -44,6 +44,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.Comparator;
 import java.util.Collections;
+import java.util.HashSet;
 
 @Service
 @RequiredArgsConstructor
@@ -76,7 +77,12 @@ public class QuestionService {
         roomRepository.save(newRoom);
 
         //RoomMember 테이블에 호스트 추가
-        RoomMember newMember = RoomMember.of(newRoom, host);
+        List<String> usedNicknames = roomMemberRepository.findNicknamesByRoomId(newRoom.getId());
+        RoomMember newMember = RoomMember.of(
+                newRoom,
+                host,
+                new HashSet<>()
+        );
         roomMemberRepository.save(newMember);
 
         Question question = Question.createFirstQuestionOf(
@@ -113,6 +119,9 @@ public class QuestionService {
 
         Room room = question.getRoom();
 
+        List<String> usedNicknames = 
+        roomMemberRepository.findNicknamesByRoomId(room.getId());
+
         if (question.getCurrentParticipants() >= question.getMaxParticipants()) {
             throw new RuntimeException("참여 인원이 초과되었습니다.");
         }
@@ -123,7 +132,11 @@ public class QuestionService {
 
         question.increaseCurrentParticipants();//DirtyChecking으로 저장
 
-        RoomMember newMember = RoomMember.of(room, participant);
+        RoomMember newMember = RoomMember.of(
+                room,
+                participant,
+                new HashSet<>(usedNicknames)
+        );
         roomMemberRepository.save(newMember);
 
         //TODO:로직 간소화....

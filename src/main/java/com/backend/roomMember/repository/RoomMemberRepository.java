@@ -22,4 +22,11 @@ public interface RoomMemberRepository extends JpaRepository<RoomMember,Long> {
     List<RoomMember> findAllByMember(@Param("member") Member member);
 
     Optional<RoomMember> findByRoomAndMember(Room room, Member member);
+
+    @Query("""
+        select rm.roomNickname
+        from RoomMember rm
+        where rm.room.id = :roomId
+    """)
+    List<String> findNicknamesByRoomId(@Param("roomId") Long roomId);
 }
