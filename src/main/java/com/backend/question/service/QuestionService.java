@@ -165,19 +165,17 @@ public class QuestionService {
 
         List<Question> questions = questionRepository.findByHost(member);
 
-        String effectiveOrder = (order == null || order.isBlank()) ? "latest" : order;
-        
-        List<Question> ordered = switch (effectiveOrder) {
+        List<Question> ordered = switch (order) {
             case "popular" -> questions.stream()
-                    .sorted(java.util.Comparator
+                    .sorted(Comparator
                             .comparingInt(Question::getCurrentParticipants)
                             .reversed())
                     .toList();
             case "oldest" -> questions.stream()
-                    .sorted(java.util.Comparator.comparing(Question::getCreatedAt))
+                    .sorted(Comparator.comparing(Question::getCreatedAt))
                     .toList();
             case "latest" -> questions.stream()
-                    .sorted(java.util.Comparator.comparing(Question::getCreatedAt).reversed())
+                    .sorted(Comparator.comparing(Question::getCreatedAt).reversed())
                     .toList();
             default -> questions;  // 이상한 값이면 그냥 원래 순서
         };
@@ -225,8 +223,8 @@ public class QuestionService {
             questions = questionRepository.findByRoomIn(myRooms);
         }
 
-        String effectiveOrder = (order == null || order.isBlank()) ? "latest" : order;
-
+        String effectiveOrder = order;
+        
         List<Question> ordered = switch (effectiveOrder) {
             case "popular" -> questions.stream()
                     .sorted(Comparator.comparingInt(Question::getCurrentParticipants).reversed())

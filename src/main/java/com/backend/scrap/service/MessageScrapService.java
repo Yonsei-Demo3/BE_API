@@ -71,10 +71,16 @@ public class MessageScrapService {
      */
     @Transactional(readOnly = true)
     public List<ScrapMessageDTO> getScraps(String userId, String order) {
-        Sort sort = "oldest".equalsIgnoreCase(order)
-            ? Sort.by(Sort.Direction.ASC, "scrappedAt")   // 오래된 순
-            : Sort.by(Sort.Direction.DESC, "scrappedAt"); // 기본: 최신 순
-        return messageScrapRepository.findScrapsByUserId(userId, sort);
+        Sort sort;
+        if ("oldest".equalsIgnoreCase(order)) {
+            sort = Sort.by(Sort.Direction.ASC, "scrappedAt");   // 오래된 순
+        } else if ("popular".equalsIgnoreCase(order)) {
+            sort = Sort.by(Sort.Direction.DESC, "scrapCount"); // 인기순 (스크랩 수 내림차순)
+        } else {
+            sort = Sort.by(Sort.Direction.DESC, "scrappedAt"); // 기본: 최신 순
+        }
+        PageRequest pageRequest = PageRequest.of(0, Integer.MAX_VALUE, sort);
+        return messageScrapRepository.findScrapsByUserId(userId, pageRequest).getContent();
     }
 
     /**

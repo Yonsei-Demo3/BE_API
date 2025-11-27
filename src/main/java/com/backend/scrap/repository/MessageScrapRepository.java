@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.Optional;
@@ -58,5 +59,5 @@ public interface MessageScrapRepository extends JpaRepository<MessageScrap, Long
         left join q.content c
     where s.member.userId = :userId
     """)
-    List<ScrapMessageDTO> findScrapsByUserId(@Param("userId") String userId, Sort sort);
+    Page<ScrapMessageDTO> findScrapsByUserId(@Param("userId") String userId, Pageable pageable);
 }
