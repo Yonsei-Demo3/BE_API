@@ -251,7 +251,8 @@ public class QuestionService {
                 // 🔹 ACTIVE면 JOINED, 그 외(RECRUITING/READY_CHECK)는 WAITING
                 if (question.getStatus() == QuestionStatus.ACTIVE) {
                     myStatus = ParticipationStatus.JOINED;
-                } else {
+                } else if (question.getStatus() == QuestionStatus.RECRUITING ||
+                           question.getStatus() == QuestionStatus.READY_CHECK) {
                     myStatus = ParticipationStatus.WAITING;
                 }
             }
