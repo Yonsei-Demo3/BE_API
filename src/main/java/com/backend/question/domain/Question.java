@@ -66,7 +66,7 @@ public class Question extends BaseTimeEntity {
         this.currentParticipants--;
     }
 
-    @Column(name = "like_count", nullable = false)
+    @Column(name = "like_count", nullable = false, columnDefinition = "int default 0")
     private int likeCount = 0;
 
     public void increaseLikeCount() {

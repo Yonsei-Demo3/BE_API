@@ -195,8 +195,10 @@ public class QuestionService {
                 Question::getLikeCount
         ));
 
-        List<Long> questionIds = questions.stream().map(Question::getId).toList();
-        List<Long> likedIds = likeRepository.findLikedQuestionIds(userId, questionIds);
+        List<Long> questionIds = ordered.stream().map(Question::getId).toList();
+        List<Long> likedIds = questionIds.isEmpty()
+                ? Collections.emptyList()
+                : likeRepository.findLikedQuestionIds(userId, questionIds);
 
         Map<Long, Boolean> isLikedByMeMap = likedIds.stream()
                 .collect(Collectors.toMap(id -> id, id -> true));
@@ -276,8 +278,10 @@ public class QuestionService {
                 Question::getLikeCount
         ));
     
-        List<Long> questionIds = questions.stream().map(Question::getId).toList();
-        List<Long> likedIds = likeRepository.findLikedQuestionIds(userId, questionIds);
+        List<Long> questionIds = ordered.stream().map(Question::getId).toList();
+        List<Long> likedIds = questionIds.isEmpty()
+                ? Collections.emptyList()
+                : likeRepository.findLikedQuestionIds(userId, questionIds);
     
         Map<Long, Boolean> isLikedByMeMap = likedIds.stream()
                 .collect(Collectors.toMap(id -> id, id -> true));
@@ -419,7 +423,9 @@ public class QuestionService {
         if (userId != null) {
             List<Long> ids = questions.stream().map(Question::getId).toList();
     
-            List<Long> likedIds = likeRepository.findLikedQuestionIds(userId, ids);
+            List<Long> likedIds = ids.isEmpty()
+                ? Collections.emptyList()
+                : likeRepository.findLikedQuestionIds(userId, ids);
     
             isLikedByMeMap = likedIds.stream()
                     .collect(Collectors.toMap(id -> id, id -> true));
