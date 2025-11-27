@@ -66,6 +66,17 @@ public class Question extends BaseTimeEntity {
         this.currentParticipants--;
     }
 
+    @Column(name = "like_count", nullable = false)
+    private int likeCount = 0;
+
+    public void increaseLikeCount() {
+        this.likeCount++;
+    }
+
+    public void decreaseLikeCount() {
+        if (this.likeCount > 0) this.likeCount--;
+    }
+
 
     public void recruitingToReadyCheck() {
         if (this.status != QuestionStatus.RECRUITING) {

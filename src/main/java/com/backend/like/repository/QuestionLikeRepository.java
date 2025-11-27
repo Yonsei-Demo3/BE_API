@@ -16,10 +16,6 @@ public interface QuestionLikeRepository extends JpaRepository<QuestionLike, Long
 
     void deleteByQuestionAndMember(Question question, Member member);
 
-    long countByQuestion_Id(Long questionId);
-
-    boolean existsByQuestion_IdAndMember_UserId(Long questionId, String userId);
-
     @Query("""
         SELECT ql.question.id AS questionId,
                COUNT(allLikes.id) AS likeCount
@@ -30,4 +26,15 @@ public interface QuestionLikeRepository extends JpaRepository<QuestionLike, Long
         GROUP BY ql.question.id
         """)
     List<QuestionLikeSummary> findLikedQuestionIdsWithCountsByUserId(@Param("userId") String userId);
+
+    @Query("""
+        select ql.question.id 
+        from QuestionLike ql
+        where ql.member.userId = :userId
+        and ql.question.id in :questionIds
+        """)
+    List<Long> findLikedQuestionIds(
+            @Param("userId") String userId,
+            @Param("questionIds") List<Long> questionIds
+    );
 }

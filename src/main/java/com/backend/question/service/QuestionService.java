@@ -23,6 +23,7 @@ import com.backend.question.dto.response.QuestionDetailResponseDTO;
 import com.backend.question.dto.response.QuestionMembersResponseDTO;
 import com.backend.question.dto.response.QuestionResponseDTO;
 import com.backend.question.repository.QuestionRepository;
+import com.backend.like.repository.QuestionLikeRepository;
 import com.backend.room.domain.Room;
 import com.backend.room.repository.RoomRepository;
 import com.backend.roomMember.domain.RoomMember;
@@ -42,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.Comparator;
+import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
@@ -59,6 +61,7 @@ public class QuestionService {
     private final NotificationPublisher notificationPublisher;
     private final NotificationRepository notificationRepository;
     private final CategoryContentRepository categoryContentRepository;
+    private final QuestionLikeRepository likeRepository;
 
     @Transactional
     public CreateQuestionResponseDTO createFirstQuestion(String hostUserId, CreateFirstQuestionRequestDTO dto) {
@@ -187,7 +190,24 @@ public class QuestionService {
                 q -> ParticipationStatus.JOINED
         ));
 
-        return questionDtoAssembler.toListDto(ordered, myStatusMap);
+        Map<Long, Integer> likeCountMap = questions.stream()
+        .collect(Collectors.toMap(
+                Question::getId,
+                Question::getLikeCount
+        ));
+
+        List<Long> questionIds = questions.stream().map(Question::getId).toList();
+        List<Long> likedIds = likeRepository.findLikedQuestionIds(userId, questionIds);
+
+        Map<Long, Boolean> isLikedByMeMap = likedIds.stream()
+                .collect(Collectors.toMap(id -> id, id -> true));
+
+        return questionDtoAssembler.toListDto(
+                ordered,
+                myStatusMap,
+                likeCountMap,
+                isLikedByMeMap
+        );
     }
 
     public List<QuestionResponseDTO> getQuestions(String userId, String sort, String order) {
@@ -251,7 +271,24 @@ public class QuestionService {
                         }
                 ));
 
-        return questionDtoAssembler.toListDto(ordered, myStatusMap);
+        Map<Long, Integer> likeCountMap = questions.stream()
+        .collect(Collectors.toMap(
+                Question::getId,
+                Question::getLikeCount
+        ));
+    
+        List<Long> questionIds = questions.stream().map(Question::getId).toList();
+        List<Long> likedIds = likeRepository.findLikedQuestionIds(userId, questionIds);
+    
+        Map<Long, Boolean> isLikedByMeMap = likedIds.stream()
+                .collect(Collectors.toMap(id -> id, id -> true));
+    
+        return questionDtoAssembler.toListDto(
+                ordered,
+                myStatusMap,
+                likeCountMap,
+                isLikedByMeMap
+        );
     }
     //TODO: N+1 문제 해결
     public QuestionDetailResponseDTO getQuestionDetailById(Long questionId, String userId) {
@@ -392,6 +429,7 @@ public class QuestionService {
 
     public Page<QuestionResponseDTO> searchQuestions(String userId, QuestionSearchRequestDTO dto, Pageable pageable) {
         Page<Question> questionPage = questionRepository.search(dto, pageable);
+        List<Question> questions = questionPage.getContent();
         Map<Long, ParticipationStatus> myStatusMap = java.util.Collections.emptyMap();
 
         if (userId != null) {
@@ -415,9 +453,28 @@ public class QuestionService {
                     ));
         }
 
+        Map<Long, Integer> likeCountMap = questions.stream()
+        .collect(Collectors.toMap(
+                Question::getId,
+                Question::getLikeCount
+        ));
+
+        Map<Long, Boolean> isLikedByMeMap = Collections.emptyMap();
+
+        if (userId != null) {
+            List<Long> ids = questions.stream().map(Question::getId).toList();
+    
+            List<Long> likedIds = likeRepository.findLikedQuestionIds(userId, ids);
+    
+            isLikedByMeMap = likedIds.stream()
+                    .collect(Collectors.toMap(id -> id, id -> true));
+        }
+
         return questionDtoAssembler.toPageDto(
             questionPage,
-            myStatusMap
+            myStatusMap,
+            likeCountMap,
+            isLikedByMeMap
     );
     }
 }
