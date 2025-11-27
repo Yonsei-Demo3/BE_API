@@ -44,15 +44,22 @@ public class QuestionController {
     }
 
     @GetMapping("/my")
-    public ResponseEntity<List<QuestionResponseDTO>> getMyWrittenQuestions(@AuthenticationPrincipal CustomUserPrincipal me) {
-        List<QuestionResponseDTO> responseDTO = questionService.getMyWrittenQuestions(me.getUserId());
+    public ResponseEntity<List<QuestionResponseDTO>> getMyWrittenQuestions(
+            @AuthenticationPrincipal CustomUserPrincipal me,
+            @RequestParam(value = "order", required = false, defaultValue = "latest") String order
+        ) {
+        List<QuestionResponseDTO> responseDTO = questionService.getMyWrittenQuestions(me.getUserId(), order);
         return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
     }
 
     @GetMapping
-    public ResponseEntity<List<QuestionResponseDTO>> getMyQuestions(@AuthenticationPrincipal CustomUserPrincipal me, @RequestParam(value = "sort", required = false) String sort) {
+    public ResponseEntity<List<QuestionResponseDTO>> getMyQuestions(
+            @AuthenticationPrincipal CustomUserPrincipal me,
+            @RequestParam(value = "sort", required = false) String sort,
+            @RequestParam(value = "order", required = false, defaultValue = "latest") String order
+    ) {
 
-        List<QuestionResponseDTO> responseDTOS = questionService.getQuestions(me.getUserId(),sort);
+        List<QuestionResponseDTO> responseDTOS = questionService.getQuestions(me.getUserId(), sort, order);
         return ResponseEntity.status(HttpStatus.OK).body(responseDTOS);
     }
 
