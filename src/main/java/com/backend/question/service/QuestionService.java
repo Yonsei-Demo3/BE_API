@@ -295,22 +295,49 @@ public class QuestionService {
         );
     }
     //TODO: N+1 문제 해결
-    public QuestionDetailResponseDTO getQuestionDetailById(Long questionId) {
+    public QuestionDetailResponseDTO getQuestionDetailById(Long questionId, String userId) {
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new RuntimeException("question not found"));
-
+    
         List<Tag> tags = tagQuestionRepository.findAllByQuestion(question)
                 .stream()
                 .map(TagQuestion::getTag)
                 .toList();
-
+    
         CategoryContent categoryContent  = categoryContentRepository.findByContent(question.getContent())
                 .orElseThrow(() -> new RuntimeException("category 찾을 수 없음"));
-
+    
         Category subCategory = categoryContent.getCategory();
         Category mainCategory = subCategory.getParent();
-
-        return QuestionDetailResponseDTO.from(question, tags, mainCategory, subCategory);
+    
+        ParticipationStatus myStatus = ParticipationStatus.NONE;
+    
+        if (userId != null) {
+            Member me = memberRepository.findByUserId(userId)
+                    .orElseThrow(() -> new RuntimeException("member not found"));
+    
+            Room room = question.getRoom();
+    
+            boolean isRoomMember = roomMemberRepository.existsByRoomAndMember(room, me);
+    
+            if (isRoomMember) {
+                // 🔹 ACTIVE면 JOINED, 그 외(RECRUITING/READY_CHECK)는 WAITING
+                if (question.getStatus() == QuestionStatus.ACTIVE) {
+                    myStatus = ParticipationStatus.JOINED;
+                } else if (question.getStatus() == QuestionStatus.RECRUITING ||
+                           question.getStatus() == QuestionStatus.READY_CHECK) {
+                    myStatus = ParticipationStatus.WAITING;
+                }
+            }
+        }
+    
+        return QuestionDetailResponseDTO.from(
+                question,
+                tags,
+                mainCategory,
+                subCategory,
+                myStatus
+        );
     }
 
     //TODO: 진행중이거나 끝났을 땐 못하게 막아야함
