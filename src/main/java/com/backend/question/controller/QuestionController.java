@@ -3,6 +3,7 @@ package com.backend.question.controller;
 import com.backend.question.dto.request.QuestionSearchRequestDTO;
 import com.backend.question.dto.response.QuestionDTO;
 import com.backend.question.dto.response.QuestionDetailResponseDTO;
+import com.backend.question.dto.response.QuestionMembersResponseDTO;
 import com.backend.question.service.QuestionService;
 import com.backend.question.dto.request.CreateFirstQuestionRequestDTO;
 import com.backend.question.dto.response.CreateQuestionResponseDTO;
@@ -89,7 +90,12 @@ public class QuestionController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
     }
 
+    @GetMapping("/{questionId}/members")
+    public ResponseEntity<QuestionMembersResponseDTO> getQuestionMembers(@AuthenticationPrincipal CustomUserPrincipal me,@PathVariable Long questionId) {
 
+        QuestionMembersResponseDTO responseDTO = questionService.getQuestionMembers(questionId, me.getUserId());
+        return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
+    }
 
 
     @PostMapping("/search")
