@@ -24,10 +24,6 @@ public class KakaoAuthService {
     public Member upsertKakaoUser(String socialId, String email, String nickname, String profileImageUrl) {
         return memberRepo.findBySocialProviderAndSocialId(SocialProvider.KAKAO, socialId)
                 .map(m -> {
-                    // 이메일/프로필/닉네임 최신화(필요시)
-                    if (email != null && !email.equals(m.getEmail())) {
-                        // 이메일 unique라 변경 시 유효성 체크 필요 (케이스에 따라 유지 권장)
-                    }
                     if (nickname != null) m.changeNickname(nickname);
                     if (profileImageUrl != null) m.changeProfile(profileImageUrl);
                     return m;
