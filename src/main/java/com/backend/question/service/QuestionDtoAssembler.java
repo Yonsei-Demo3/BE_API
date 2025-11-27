@@ -25,23 +25,35 @@ public class QuestionDtoAssembler {
     private final TagQuestionRepository tagQuestionRepository;
     private final CategoryContentRepository categoryContentRepository;
 
-    public Page<QuestionResponseDTO> toPageDto(Page<Question> questionPage, Map<Long, ParticipationStatus> myStatusMap
+    public Page<QuestionResponseDTO> toPageDto(
+            Page<Question> questionPage,
+            Map<Long, ParticipationStatus> myStatusMap,
+            Map<Long, Integer> likeCountMap,
+            Map<Long, Boolean> isLikedByMeMap
     ) {
         List<Question> questions = questionPage.getContent();
-
         Map<Long, List<Tag>> questionTagMap = getQuestionTagMap(questions);
         Map<Long, Category> contentCategoryMap = getContentCategoryMap(questions);
+        
         
         return questionPage.map(question -> {
             List<Tag> tags = questionTagMap.getOrDefault(question.getId(), Collections.emptyList());
             Category category = contentCategoryMap.get(question.getContent().getId());
             ParticipationStatus myStatus = myStatusMap.getOrDefault(question.getId(), ParticipationStatus.NONE);
+
+            Integer likeCount = likeCountMap.getOrDefault(question.getId(), 0);
+            Boolean isLiked = isLikedByMeMap.getOrDefault(question.getId(), false);
             
-            return QuestionResponseDTO.from(question, category, tags, myStatus);
+            return QuestionResponseDTO.from(question, category, tags, myStatus, likeCount, isLiked);
         });
     }
 
-    public List<QuestionResponseDTO> toListDto(List<Question> questions, Map<Long, ParticipationStatus> myStatusMap) {
+    public List<QuestionResponseDTO> toListDto(
+            List<Question> questions,
+            Map<Long, ParticipationStatus> myStatusMap,
+            Map<Long, Integer> likeCountMap,
+            Map<Long, Boolean> isLikedByMeMap
+        ) {
         if (questions.isEmpty()) {
             return Collections.emptyList();
         }
@@ -56,8 +68,11 @@ public class QuestionDtoAssembler {
                     List<Tag> tags = questionTagMap.getOrDefault(question.getId(), Collections.emptyList());
                     Category category = contentCategoryMap.get(question.getContent().getId());
                     ParticipationStatus myStatus = myStatusMap.getOrDefault(question.getId(), ParticipationStatus.NONE);
+                    
+                    Integer likeCount = likeCountMap.getOrDefault(question.getId(), 0);
+                    Boolean isLiked = isLikedByMeMap.getOrDefault(question.getId(), false);
 
-                    return QuestionResponseDTO.from(question, category, tags, myStatus);
+                    return QuestionResponseDTO.from(question, category, tags, myStatus, likeCount, isLiked);
                 })
                 .toList();
     }

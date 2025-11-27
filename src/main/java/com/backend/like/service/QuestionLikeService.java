@@ -36,9 +36,10 @@ public class QuestionLikeService {
 
         if (!likeRepository.existsByQuestionAndMember(question, member)) {
             likeRepository.save(new QuestionLike(question, member));
+            question.increaseLikeCount();
         }
 
-        return likeRepository.countByQuestion_Id(questionId);
+        return question.getLikeCount();
     }
 
     /**
@@ -52,9 +53,12 @@ public class QuestionLikeService {
         Member member = memberRepository.findByUserId(userId)
                 .orElseThrow(() -> new AuthError("invalid_user", "존재하지 않는 회원입니다."));
 
-        likeRepository.deleteByQuestionAndMember(question, member);
+        if (likeRepository.existsByQuestionAndMember(question, member)) {
+                likeRepository.deleteByQuestionAndMember(question, member);
+                question.decreaseLikeCount();
+                }
 
-        return likeRepository.countByQuestion_Id(questionId);
+        return question.getLikeCount();
     }
 
     /**
@@ -62,10 +66,10 @@ public class QuestionLikeService {
      */
     @Transactional(readOnly = true)
     public long getLikeCount(Long questionId) {
-        questionRepository.findById(questionId)
+        Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 질문입니다. id=" + questionId));
-                
-        return likeRepository.countByQuestion_Id(questionId);
+
+        return question.getLikeCount();
     }
 
     /**

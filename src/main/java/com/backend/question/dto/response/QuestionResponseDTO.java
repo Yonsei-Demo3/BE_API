@@ -30,10 +30,19 @@ public record QuestionResponseDTO(
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
         LocalDateTime createdAt,
 
-        ParticipationStatus myParticipationStatus
+        ParticipationStatus myParticipationStatus,
+        Integer likeCount,
+        Boolean isLikedByMe
         )
 {
-    public static QuestionResponseDTO from(Question question, Category subCategory, List<Tag> tags, ParticipationStatus myStatus) {
+    public static QuestionResponseDTO from(
+                Question question,
+                Category subCategory,
+                List<Tag> tags,
+                ParticipationStatus myStatus,
+                Integer likeCount,
+                Boolean isLikedByMe
+        ) {
         List<String> tagNames = tags.stream()
                 .map(Tag::getName)
                 .toList();
@@ -64,7 +73,9 @@ public record QuestionResponseDTO(
                 question.getCurrentParticipants(),
                 tagNames,
                 question.getCreatedAt(),
-                myStatus
+                myStatus,
+                likeCount,
+                isLikedByMe
         );
     }
 }
