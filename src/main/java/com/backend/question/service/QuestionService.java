@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.Comparator;
 
 @Service
 @RequiredArgsConstructor
@@ -158,11 +159,28 @@ public class QuestionService {
         return QuestionDTO.from(question);
     }
 
-    public List<QuestionResponseDTO> getMyWrittenQuestions(String userId) {
+    public List<QuestionResponseDTO> getMyWrittenQuestions(String userId, String order) {
         Member member =  memberRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("member not found"));
 
         List<Question> questions = questionRepository.findByHost(member);
+
+        String effectiveOrder = (order == null || order.isBlank()) ? "latest" : order;
+        
+        List<Question> ordered = switch (effectiveOrder) {
+            case "popular" -> questions.stream()
+                    .sorted(java.util.Comparator
+                            .comparingInt(Question::getCurrentParticipants)
+                            .reversed())
+                    .toList();
+            case "oldest" -> questions.stream()
+                    .sorted(java.util.Comparator.comparing(Question::getCreatedAt))
+                    .toList();
+            case "latest" -> questions.stream()
+                    .sorted(java.util.Comparator.comparing(Question::getCreatedAt).reversed())
+                    .toList();
+            default -> questions;  // 이상한 값이면 그냥 원래 순서
+        };
 
         Map<Long, ParticipationStatus> myStatusMap = questions.stream()
         .collect(Collectors.toMap(
@@ -170,10 +188,10 @@ public class QuestionService {
                 q -> ParticipationStatus.JOINED
         ));
 
-        return questionDtoAssembler.toListDto(questions, myStatusMap);
+        return questionDtoAssembler.toListDto(ordered, myStatusMap);
     }
 
-    public List<QuestionResponseDTO> getQuestions(String userId, String sort) {
+    public List<QuestionResponseDTO> getQuestions(String userId, String sort, String order) {
         Member member = memberRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("member not found"));
 
@@ -207,6 +225,21 @@ public class QuestionService {
             questions = questionRepository.findByRoomIn(myRooms);
         }
 
+        String effectiveOrder = (order == null || order.isBlank()) ? "latest" : order;
+
+        List<Question> ordered = switch (effectiveOrder) {
+            case "popular" -> questions.stream()
+                    .sorted(Comparator.comparingInt(Question::getCurrentParticipants).reversed())
+                    .toList();
+            case "oldest" -> questions.stream()
+                    .sorted(Comparator.comparing(Question::getCreatedAt))
+                    .toList();
+            case "latest" -> questions.stream()
+                    .sorted(Comparator.comparing(Question::getCreatedAt).reversed())
+                    .toList();
+            default -> questions; // 이상한 값 들어오면 그냥 기존 순서 유지
+        };
+
         Map<Long, ParticipationStatus> myStatusMap = questions.stream()
                 .collect(Collectors.toMap(
                         Question::getId,
@@ -219,7 +252,7 @@ public class QuestionService {
                         }
                 ));
 
-        return questionDtoAssembler.toListDto(questions, myStatusMap);
+        return questionDtoAssembler.toListDto(ordered, myStatusMap);
     }
     //TODO: N+1 문제 해결
     public QuestionDetailResponseDTO getQuestionDetailById(Long questionId) {

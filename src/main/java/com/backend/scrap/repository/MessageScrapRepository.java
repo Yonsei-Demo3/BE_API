@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,8 +20,6 @@ public interface MessageScrapRepository extends JpaRepository<MessageScrap, Long
 
     Optional<MessageScrap> findByMemberAndMessage(Member member, Message message);
     List<MessageScrap> findByMemberAndMessageIn(Member member, List<Message> messages);
-
-    List<MessageScrap> findByMemberOrderByIdDesc(Member member);
 
     @Query("""
     select new com.backend.scrap.dto.ScrappedMessageSummaryDTO(
@@ -58,7 +57,6 @@ public interface MessageScrapRepository extends JpaRepository<MessageScrap, Long
         join Question q on q.room = m.room
         left join q.content c
     where s.member.userId = :userId
-    order by s.scrappedAt desc
     """)
-    List<ScrapMessageDTO> findScrapsByUserId(@Param("userId") String userId);
+    List<ScrapMessageDTO> findScrapsByUserId(@Param("userId") String userId, Sort sort);
 }

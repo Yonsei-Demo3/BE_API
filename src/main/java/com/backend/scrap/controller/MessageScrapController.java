@@ -59,23 +59,25 @@ public class MessageScrapController {
     @Operation(summary = "내 스크랩 메시지 목록 조회")
     @GetMapping("/scrap/me")
     public ResponseEntity<List<ScrapMessageDTO>> getMyScraps(
-            @AuthenticationPrincipal CustomUserPrincipal me
+            @AuthenticationPrincipal CustomUserPrincipal me,
+            @RequestParam(name = "order", defaultValue = "latest") String order
     ) {
         if (me == null) {
             throw new AuthError("unauthorized", "로그인이 필요합니다.");
         }
-
+    
         String userId = me.getUserId();
-        List<ScrapMessageDTO> list = messageScrapService.getScraps(userId);
+        List<ScrapMessageDTO> list = messageScrapService.getScraps(userId, order);
         return ResponseEntity.ok(list);
     }
 
     @Operation(summary = "특정 사용자의 스크랩 메시지 목록 조회")
     @GetMapping("/scrap/{userId}")
     public ResponseEntity<List<ScrapMessageDTO>> getUserScraps(
-            @PathVariable String userId
+            @PathVariable String userId,
+            @RequestParam(name = "order", defaultValue = "latest") String order
     ) {
-        List<ScrapMessageDTO> list = messageScrapService.getScraps(userId);
+        List<ScrapMessageDTO> list = messageScrapService.getScraps(userId, order);
         return ResponseEntity.ok(list);
     }
 

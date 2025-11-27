@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.backend.scrap.dto.ScrappedMessageSummaryDTO;
 import org.springframework.data.domain.PageRequest;
-
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -70,8 +70,11 @@ public class MessageScrapService {
      * 스크랩 목록 조회
      */
     @Transactional(readOnly = true)
-    public List<ScrapMessageDTO> getScraps(String userId) {
-        return messageScrapRepository.findScrapsByUserId(userId);
+    public List<ScrapMessageDTO> getScraps(String userId, String order) {
+        Sort sort = "oldest".equalsIgnoreCase(order)
+            ? Sort.by(Sort.Direction.ASC, "scrappedAt")   // 오래된 순
+            : Sort.by(Sort.Direction.DESC, "scrappedAt"); // 기본: 최신 순
+        return messageScrapRepository.findScrapsByUserId(userId, sort);
     }
 
     /**
