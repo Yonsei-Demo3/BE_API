@@ -91,8 +91,7 @@ public class QuestionController {
     }
 
     @GetMapping("/{questionId}/members")
-    public ResponseEntity<QuestionMembersResponseDTO> getQuestionMembers(@AuthenticationPrincipal CustomUserPrincipal me,@PathVariable Long questionId) {
-
+    public ResponseEntity<QuestionMembersResponseDTO> getQuestionMembers(@AuthenticationPrincipal CustomUserPrincipal me, @PathVariable Long questionId) {
         QuestionMembersResponseDTO responseDTO = questionService.getQuestionMembers(questionId, me.getUserId());
         return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
     }
